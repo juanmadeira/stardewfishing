@@ -1,3 +1,4 @@
+import time
 import graphics as gf
 from PIL import Image as PILImage
 
@@ -20,21 +21,39 @@ start = resize("assets/start.png", "start", "png", 523, 57)
 start = gf.Image(gf.Point(640, 600), "assets/start-resized.png")
 gui = resize("assets/gui.png", "gui", "png", 152, 600)
 gui = gf.Image(gf.Point(1050, 360), "assets/gui-resized.png")
+cursor = resize("assets/cursor-easy.png", "cursor-easy", "png", 36, 108)
+cursor = gf.Image(gf.Point(1060, 583), "assets/cursor-easy-resized.png")
+
+def is_drawn(obj):
+    return obj.canvas is not None
 
 def start_game():
-    title.undraw()
-    start.undraw()
-    gui.draw(win)
+    if not is_drawn(gui):
+        title.undraw()
+        start.undraw()
+        gui.draw(win)
+        cursor.draw(win)
+    else:
+        return False
 
-def get_key(key_click):
+def get_pos(key_click):
     x = key_click.getX()
     y = key_click.getY()
-
     return x, y
+
+def move_cursor(amount):
+    y = cursor.getAnchor().getY()
+    new_y = y - amount
+    if new_y > 584:
+        new_y = 584
+    elif new_y < 129:
+        new_y = 129
+    cursor.move(0, new_y - y)
 
 background.draw(win)
 title.draw(win)
 start.draw(win)
+last_move = time.time()
 
 while True:
     click = win.checkMouse()
@@ -42,11 +61,16 @@ while True:
     key = key.upper()
 
     if click:
-        print(get_key(click))
-    if key != "":
-        print(key)
-    if key == "ESCAPE" or key == "Q":
-        break
-    if key == "RETURN":
-        start_game()
-
+        print(get_pos(click))
+    elif key != "":
+        print(f"{key}, y={cursor.getAnchor().getY():.2f}")
+        if key == "ESCAPE" or key == "Q":
+            break
+        elif key == "RETURN" or key == "KP_ENTER":
+            start_game()
+        elif key == "SPACE" or key == "UP":
+            for _ in range(60):
+                move_cursor(1.15)
+    if time.time() - last_move >= 0.0167:
+        move_cursor(-2)
+        last_move = time.time()
