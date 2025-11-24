@@ -1,25 +1,25 @@
 import graphics as gf
 from PIL import Image as PILImage
 
-win = gf.GraphWin("Stardew Fishing", 720, 420)
+win = gf.GraphWin("Stardew Fishing", 1280, 720)
 
-background = gf.Image(gf.Point(360, 210), "assets/background.png")
 # arquivos *-resized são temporários
 # e servem só pra ir alterando o tamanho sem precisar mexer num editor externo
-# assim que definidos, linhas que envolvem PILImage vão ser excluídas
-title = PILImage.open("assets/title.png")
-title = title.resize((453, 207))
-title.save("assets/title-resized.png")
-title = gf.Image(gf.Point(360, 110), "assets/title-resized.png")
-start = gf.Image(gf.Point(360, 375), "assets/start.png")
-gui = PILImage.open("assets/gui.png")
-gui = gui.resize((95, 375))
-gui.save("assets/gui-resized.png")
-gui = gf.Image(gf.Point(600, 210), "assets/gui-resized.png")
+# assim que definidos, vão substituir tamanhos originais
+def resize(path, filename, format, width, height):
+    image = PILImage.open(path)
+    image = image.resize((width, height))
+    image.save(f"assets/{filename}-resized.{format}")
+    return image
 
-background.draw(win)
-title.draw(win)
-start.draw(win)
+background = resize("assets/background.png", "background", "png", 1280, 720)
+background = gf.Image(gf.Point(640, 360), "assets/background-resized.png")
+title = resize("assets/title.png", "title", "png", 724, 331)
+title = gf.Image(gf.Point(640, 200), "assets/title-resized.png")
+start = resize("assets/start.png", "start", "png", 523, 57)
+start = gf.Image(gf.Point(640, 600), "assets/start-resized.png")
+gui = resize("assets/gui.png", "gui", "png", 152, 600)
+gui = gf.Image(gf.Point(1050, 360), "assets/gui-resized.png")
 
 def start_game():
     title.undraw()
@@ -31,6 +31,10 @@ def get_key(key_click):
     y = key_click.getY()
 
     return x, y
+
+background.draw(win)
+title.draw(win)
+start.draw(win)
 
 while True:
     click = win.checkMouse()
