@@ -3,12 +3,12 @@ from PIL import Image as PILImage
 
 win = gf.GraphWin("Stardew Fishing", 720, 420)
 
-background = gf.Image(gf.Point(360, 210), "img/background.png")
-title = PILImage.open("img/title.png")
+background = gf.Image(gf.Point(360, 210), "assets/background.png")
+title = PILImage.open("assets/title.png")
 title = title.resize((453, 207))
-title.save("img/title-resized.png")
-title = gf.Image(gf.Point(360, 110), "img/title-resized.png")
-start = gf.Image(gf.Point(360, 375), "img/start.png")
+title.save("assets/title-resized.png")
+title = gf.Image(gf.Point(360, 110), "assets/title-resized.png")
+start = gf.Image(gf.Point(360, 375), "assets/start.png")
 
 background.draw(win)
 title.draw(win)
