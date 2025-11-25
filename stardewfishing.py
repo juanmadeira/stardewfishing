@@ -54,6 +54,7 @@ background.draw(win)
 title.draw(win)
 start.draw(win)
 last_move = time.time()
+gravity = 0
 
 while True:
     click = win.checkMouse()
@@ -63,14 +64,31 @@ while True:
     if click:
         print(get_pos(click))
     elif key != "":
-        print(f"{key}, y={cursor.getAnchor().getY():.2f}")
         if key == "ESCAPE" or key == "Q":
             break
         elif key == "RETURN" or key == "KP_ENTER":
             start_game()
         elif key == "SPACE" or key == "UP":
-            for _ in range(60):
-                move_cursor(1.15)
-    if time.time() - last_move >= 0.0167:
-        move_cursor(-2)
+            if gravity < 0:
+                gravity = 0
+            if cursor.getAnchor().getY() <= 129:
+                gravity = 0
+            if gravity >= 0:
+                gravity += 0.5
+            # for _ in range(60):
+            move_cursor(gravity)
+
+    if cursor.getAnchor().getY() >= 584:
+        gravity = 0
+    elif cursor.getAnchor().getY() <= 129:
+        gravity = 0
+
+    if key == "":
+        # if time.time() - last_move >= 1/60:
+        gravity -= 0.15
+        move_cursor(gravity)
         last_move = time.time()
+
+    time.sleep(1/60)
+    
+    print(f"{key}, y={cursor.getAnchor().getY():.2f},gravity={gravity}")
