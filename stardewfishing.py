@@ -1,6 +1,7 @@
 import time
 import graphics as gf
 from PIL import Image as PILImage
+from entities import BarEntity
 
 win = gf.GraphWin("Stardew Fishing", 1280, 720)
 
@@ -23,6 +24,7 @@ gui = resize("assets/gui.png", "gui", "png", 152, 600)
 gui = gf.Image(gf.Point(1050, 360), "assets/gui-resized.png")
 cursor = resize("assets/cursor-easy.png", "cursor-easy", "png", 36, 108)
 cursor = gf.Image(gf.Point(1060, 583), "assets/cursor-easy-resized.png")
+
 
 def is_drawn(obj):
     return obj.canvas is not None
