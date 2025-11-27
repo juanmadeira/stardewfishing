@@ -1,4 +1,5 @@
 import time
+import random
 import graphics as gph
 from PIL import Image as PILImage
 from entities import BarEntity, Cursor
@@ -15,18 +16,43 @@ def resize(path, filename, format, width, height):
     return image
 
 background = resize("assets/background.png", "background", "png", 1280, 720)
-background = gph.Image(gph.Point(640, 360), "assets/background-resized.png")
 title = resize("assets/title.png", "title", "png", 724, 331)
-title = gph.Image(gph.Point(640, 200), "assets/title-resized.png")
 start = resize("assets/start.png", "start", "png", 523, 57)
-start = gph.Image(gph.Point(640, 600), "assets/start-resized.png")
 gui = resize("assets/gui.png", "gui", "png", 152, 600)
+cursor_easy = resize("assets/cursor-easy.png", "cursor-easy", "png", 36, 201)
+cursor_medium = resize("assets/cursor-medium.png", "cursor-medium", "png", 36, 108)
+cursor_hard = resize("assets/cursor-hard.png", "cursor-hard", "png", 36, 36)
+
+background = gph.Image(gph.Point(640, 360), "assets/background-resized.png")
+title = gph.Image(gph.Point(640, 200), "assets/title-resized.png")
+start = gph.Image(gph.Point(640, 600), "assets/start-resized.png")
 gui = gph.Image(gph.Point(1050, 360), "assets/gui-resized.png")
-cursor = resize("assets/cursor-easy.png", "cursor-easy", "png", 36, 108)
+cursor_easy = gph.Image(gph.Point(1060, 520), "assets/cursor-easy-resized.png")
+cursor_medium = gph.Image(gph.Point(1060, 583), "assets/cursor-medium-resized.png")
+cursor_hard = gph.Image(gph.Point(1060, 619), "assets/cursor-hard-resized.png")
 
-cursor = Cursor("assets/cursor-easy-resized.png", gph.Point(1060, 583), win)
+def get_difficulty():
+    return random.choice(["easy", "medium", "hard"])
 
-game_started = False
+difficulty = get_difficulty()
+
+if difficulty == "easy":
+    top = 175
+    bottom = 537
+elif difficulty == "medium":
+    top = 129
+    bottom = 583
+elif difficulty == "hard":
+    top = 93
+    bottom = 619
+
+cursors = {
+    "easy": cursor_easy,
+    "medium": cursor_medium,
+    "hard": cursor_hard
+}
+
+cursor = cursors[difficulty]
 
 def is_drawn(obj):
     return obj.canvas is not None
