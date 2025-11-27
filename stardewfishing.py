@@ -1,7 +1,7 @@
 import time
 import graphics as gf
 from PIL import Image as PILImage
-from entities import BarEntity
+from entities import BarEntity, Cursor
 
 win = gf.GraphWin("Stardew Fishing", 1280, 720)
 
@@ -23,8 +23,10 @@ start = gf.Image(gf.Point(640, 600), "assets/start-resized.png")
 gui = resize("assets/gui.png", "gui", "png", 152, 600)
 gui = gf.Image(gf.Point(1050, 360), "assets/gui-resized.png")
 cursor = resize("assets/cursor-easy.png", "cursor-easy", "png", 36, 108)
-cursor = gf.Image(gf.Point(1060, 583), "assets/cursor-easy-resized.png")
 
+cursor = Cursor("assets/cursor-easy-resized.png", gf.Point(1060, 583), win)
+
+game_started = False
 
 def is_drawn(obj):
     return obj.canvas is not None
@@ -34,63 +36,50 @@ def start_game():
         title.undraw()
         start.undraw()
         gui.draw(win)
-        cursor.draw(win)
-    else:
-        return False
+        cursor.draw()
 
 def get_pos(key_click):
     x = key_click.getX()
     y = key_click.getY()
     return x, y
 
-def move_cursor(amount):
-    y = cursor.getAnchor().getY()
-    new_y = y - amount
-    if new_y > 584:
-        new_y = 584
-    elif new_y < 129:
-        new_y = 129
-    cursor.move(0, new_y - y)
+def is_cursor_climbing(key):
+    if key == "SPACE" or key == "UP":
+        return True
+    return False
 
 background.draw(win)
 title.draw(win)
 start.draw(win)
 last_move = time.time()
-gravity = 0
+speed = 0
 
 while True:
     click = win.checkMouse()
     key = win.checkKey()
     key = key.upper()
-
     if click:
         print(get_pos(click))
-    elif key != "":
-        if key == "ESCAPE" or key == "Q":
-            break
-        elif key == "RETURN" or key == "KP_ENTER":
-            start_game()
-        elif key == "SPACE" or key == "UP":
-            if gravity < 0:
+    if not game_started and (key == "RETURN" or key == "KP_ENTER"):
+        start_game()
+        game_started = True
+    
+    else:
+        gravity = 0.3
+        if is_cursor_climbing(key):
+            gravity = 0.5
+            speed += gravity
+        
+        else:
+            speed -= 0.15
+            if speed > 0 and cursor.isAtUpperLimit():
+                speed = 0
                 gravity = 0
-            if cursor.getAnchor().getY() <= 129:
+            if speed <= 0 and cursor.isAtLowerLimit():
+                speed = 0
                 gravity = 0
-            if gravity >= 0:
-                gravity += 0.5
-            # for _ in range(60):
-            move_cursor(gravity)
 
-    if cursor.getAnchor().getY() >= 584:
-        gravity = 0
-    elif cursor.getAnchor().getY() <= 129:
-        gravity = 0
-
-    if key == "":
-        # if time.time() - last_move >= 1/60:
-        gravity -= 0.15
-        move_cursor(gravity)
-        last_move = time.time()
-
+        cursor.move(speed)
     time.sleep(1/60)
     
-    print(f"{key}, y={cursor.getAnchor().getY():.2f},gravity={gravity}")
+    print(f"{key}, y={cursor.getY():.2f},gravity={gravity},speed={speed}")
