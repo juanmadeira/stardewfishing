@@ -1,8 +1,9 @@
 import time
-import graphics as gf
+import random
+import graphics as gph
 from PIL import Image as PILImage
 
-win = gf.GraphWin("Stardew Fishing", 1280, 720)
+win = gph.GraphWin("Stardew Fishing", 1280, 720)
 
 # arquivos *-resized são temporários
 # e servem só pra ir alterando o tamanho sem precisar mexer num editor externo
@@ -14,15 +15,43 @@ def resize(path, filename, format, width, height):
     return image
 
 background = resize("assets/background.png", "background", "png", 1280, 720)
-background = gf.Image(gf.Point(640, 360), "assets/background-resized.png")
 title = resize("assets/title.png", "title", "png", 724, 331)
-title = gf.Image(gf.Point(640, 200), "assets/title-resized.png")
 start = resize("assets/start.png", "start", "png", 523, 57)
-start = gf.Image(gf.Point(640, 600), "assets/start-resized.png")
 gui = resize("assets/gui.png", "gui", "png", 152, 600)
-gui = gf.Image(gf.Point(1050, 360), "assets/gui-resized.png")
-cursor = resize("assets/cursor-easy.png", "cursor-easy", "png", 36, 108)
-cursor = gf.Image(gf.Point(1060, 583), "assets/cursor-easy-resized.png")
+cursor_easy = resize("assets/cursor-easy.png", "cursor-easy", "png", 36, 201)
+cursor_medium = resize("assets/cursor-medium.png", "cursor-medium", "png", 36, 108)
+cursor_hard = resize("assets/cursor-hard.png", "cursor-hard", "png", 36, 36)
+
+background = gph.Image(gph.Point(640, 360), "assets/background-resized.png")
+title = gph.Image(gph.Point(640, 200), "assets/title-resized.png")
+start = gph.Image(gph.Point(640, 600), "assets/start-resized.png")
+gui = gph.Image(gph.Point(1050, 360), "assets/gui-resized.png")
+cursor_easy = gph.Image(gph.Point(1060, 520), "assets/cursor-easy-resized.png")
+cursor_medium = gph.Image(gph.Point(1060, 583), "assets/cursor-medium-resized.png")
+cursor_hard = gph.Image(gph.Point(1060, 619), "assets/cursor-hard-resized.png")
+
+def get_difficulty():
+    return random.choice(["easy", "medium", "hard"])
+
+difficulty = get_difficulty()
+
+if difficulty == "easy":
+    top = 175
+    bottom = 537
+elif difficulty == "medium":
+    top = 129
+    bottom = 583
+elif difficulty == "hard":
+    top = 93
+    bottom = 619
+
+cursors = {
+    "easy": cursor_easy,
+    "medium": cursor_medium,
+    "hard": cursor_hard
+}
+
+cursor = cursors[difficulty]
 
 def is_drawn(obj):
     return obj.canvas is not None
@@ -44,10 +73,10 @@ def get_pos(key_click):
 def move_cursor(amount):
     y = cursor.getAnchor().getY()
     new_y = y - amount
-    if new_y > 584:
-        new_y = 584
-    elif new_y < 129:
-        new_y = 129
+    if new_y > bottom:
+        new_y = bottom
+    elif new_y < top:
+        new_y = top
     cursor.move(0, new_y - y)
 
 background.draw(win)
@@ -71,20 +100,18 @@ while True:
         elif key == "SPACE" or key == "UP":
             if gravity < 0:
                 gravity = 0
-            if cursor.getAnchor().getY() <= 129:
+            if cursor.getAnchor().getY() <= top:
                 gravity = 0
             if gravity >= 0:
                 gravity += 0.5
-            # for _ in range(60):
             move_cursor(gravity)
 
-    if cursor.getAnchor().getY() >= 584:
+    if cursor.getAnchor().getY() >= bottom:
         gravity = 0
-    elif cursor.getAnchor().getY() <= 129:
+    elif cursor.getAnchor().getY() <= top:
         gravity = 0
 
     if key == "":
-        # if time.time() - last_move >= 1/60:
         gravity -= 0.15
         move_cursor(gravity)
         last_move = time.time()
