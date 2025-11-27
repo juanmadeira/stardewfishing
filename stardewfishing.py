@@ -1,9 +1,9 @@
 import time
-import graphics as gf
+import graphics as gph
 from PIL import Image as PILImage
 from entities import BarEntity, Cursor
 
-win = gf.GraphWin("Stardew Fishing", 1280, 720)
+win = gph.GraphWin("Stardew Fishing", 1280, 720)
 
 # arquivos *-resized são temporários
 # e servem só pra ir alterando o tamanho sem precisar mexer num editor externo
@@ -15,16 +15,16 @@ def resize(path, filename, format, width, height):
     return image
 
 background = resize("assets/background.png", "background", "png", 1280, 720)
-background = gf.Image(gf.Point(640, 360), "assets/background-resized.png")
+background = gph.Image(gph.Point(640, 360), "assets/background-resized.png")
 title = resize("assets/title.png", "title", "png", 724, 331)
-title = gf.Image(gf.Point(640, 200), "assets/title-resized.png")
+title = gph.Image(gph.Point(640, 200), "assets/title-resized.png")
 start = resize("assets/start.png", "start", "png", 523, 57)
-start = gf.Image(gf.Point(640, 600), "assets/start-resized.png")
+start = gph.Image(gph.Point(640, 600), "assets/start-resized.png")
 gui = resize("assets/gui.png", "gui", "png", 152, 600)
-gui = gf.Image(gf.Point(1050, 360), "assets/gui-resized.png")
+gui = gph.Image(gph.Point(1050, 360), "assets/gui-resized.png")
 cursor = resize("assets/cursor-easy.png", "cursor-easy", "png", 36, 108)
 
-cursor = Cursor("assets/cursor-easy-resized.png", gf.Point(1060, 583), win)
+cursor = Cursor("assets/cursor-easy-resized.png", gph.Point(1060, 583), win)
 
 game_started = False
 
@@ -51,7 +51,6 @@ def is_cursor_climbing(key):
 background.draw(win)
 title.draw(win)
 start.draw(win)
-last_move = time.time()
 speed = 0
 
 while True:
@@ -82,4 +81,4 @@ while True:
         cursor.move(speed)
     time.sleep(1/60)
     
-    print(f"{key}, y={cursor.getY():.2f},gravity={gravity},speed={speed}")
+    print(f"{key}, y={cursor.getCenterY():.2f},gravity={gravity},speed={speed}")
