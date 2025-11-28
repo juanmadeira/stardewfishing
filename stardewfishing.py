@@ -1,8 +1,9 @@
 import time
 import random
 import graphics as gph
+import os, glob
 from PIL import Image as PILImage
-from entities import BarEntity, Cursor
+from entities import BarEntity, Cursor, Fish
 
 win = gph.GraphWin("Stardew Fishing", 1280, 720)
 
@@ -27,32 +28,20 @@ background = gph.Image(gph.Point(640, 360), "assets/background-resized.png")
 title = gph.Image(gph.Point(640, 200), "assets/title-resized.png")
 start = gph.Image(gph.Point(640, 600), "assets/start-resized.png")
 gui = gph.Image(gph.Point(1050, 360), "assets/gui-resized.png")
+
 cursor_easy = gph.Image(gph.Point(1060, 520), "assets/cursor-easy-resized.png")
 cursor_medium = gph.Image(gph.Point(1060, 583), "assets/cursor-medium-resized.png")
 cursor_hard = gph.Image(gph.Point(1060, 619), "assets/cursor-hard-resized.png")
+fishing_progress_bar = gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270))
+fishing_progress_bar.setFill("green")
+fish = resize("assets/fish.png", "fish", "png", 32, 32)
+# TODO - select fishes with glob and randomize fish spawn
+fish = gph.Image(gph.Point(1060, 400), "assets/fish-resized.png")
+
+
 
 def get_difficulty():
     return random.choice(["easy", "medium", "hard"])
-
-difficulty = get_difficulty()
-
-if difficulty == "easy":
-    top = 175
-    bottom = 537
-elif difficulty == "medium":
-    top = 129
-    bottom = 583
-elif difficulty == "hard":
-    top = 93
-    bottom = 619
-
-cursors = {
-    "easy": cursor_easy,
-    "medium": cursor_medium,
-    "hard": cursor_hard
-}
-
-cursor = cursors[difficulty]
 
 def is_drawn(obj):
     return obj.canvas is not None
@@ -63,6 +52,8 @@ def start_game():
         start.undraw()
         gui.draw(win)
         cursor.draw()
+        fish.draw()
+        fishing_progress_bar.draw(win)
 
 def get_pos(key_click):
     x = key_click.getX()
@@ -74,10 +65,45 @@ def is_cursor_climbing(key):
         return True
     return False
 
+def cursor_contact_with_fish():
+    fish_min_y, fish_max_y = fish.getHitboxMinAndMaxY()
+    cursor_min_y, cursor_max_y = cursor.getHitboxMinAndMaxY()
+    if cursor_min_y >= fish_min_y and fish_max_y >= cursor_min_y or cursor_max_y >= fish_min_y and cursor_min_y <= fish_min_y:
+        return True
+    return False
+ 
+def grow_progress_bar(fishing_progress_bar):
+    start_point = fishing_progress_bar.getP1()
+    old_y = fishing_progress_bar.getP2().getY()
+    new_y = old_y
+    if cursor_contact_with_fish() and old_y >= 75:
+        new_y = old_y - 5
+    elif old_y <= 640:
+        new_y = old_y + 5
+    if new_y != old_y:
+        fishing_progress_bar.undraw()
+        fishing_progress_bar = gph.Rectangle(start_point, gph.Point(1115, new_y))
+        fishing_progress_bar.setFill("green")
+        fishing_progress_bar.draw(win)
+    return fishing_progress_bar
+
+difficulty = get_difficulty()
+
+cursors = {
+    "easy": cursor_easy,
+    "medium": cursor_medium,
+    "hard": cursor_hard
+}
+
+cursor = Cursor(cursors[difficulty], win)
+fish = Fish(fish, win)
+
+game_started = False
+speed = 0
+
 background.draw(win)
 title.draw(win)
 start.draw(win)
-speed = 0
 
 while True:
     click = win.checkMouse()
@@ -85,9 +111,11 @@ while True:
     key = key.upper()
     if click:
         print(get_pos(click))
-    if not game_started and (key == "RETURN" or key == "KP_ENTER"):
-        start_game()
-        game_started = True
+
+    if not game_started:
+        if key == "RETURN" or key == "KP_ENTER":
+            start_game()
+            game_started = True
     
     else:
         gravity = 0.3
@@ -104,7 +132,12 @@ while True:
                 speed = 0
                 gravity = 0
 
+
+        fishing_progress_bar = grow_progress_bar(fishing_progress_bar)
+
         cursor.move(speed)
-    time.sleep(1/60)
+        time.sleep(1/60)
     
-    print(f"{key}, y={cursor.getCenterY():.2f},gravity={gravity},speed={speed}")
+    # print(f"y={cursor.getCenterY():.2f},gravity={gravity},speed={speed},key={key}")
+    if cursor_contact_with_fish():
+        print("CURSOR IN CONTACT WITH FISH")

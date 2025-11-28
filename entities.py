@@ -2,26 +2,24 @@ import graphics as gph
 import random as rd
 
 class BarEntity:
-    def __init__(self, sprite: str, spawn_point: gph.Point, window: gph.GraphWin):
+    def __init__(self, sprite: gph.Image, window: gph.GraphWin):
         self.sprite = sprite
-        self.spawn_point = spawn_point
         self.window = window
-        self.element = gph.Image(spawn_point, sprite)
-        self.height = self.element.getHeight()
-    
+        self.height = self.sprite.getHeight()
+
     def move(self, amount):
         new_y = self.getCenterY() - amount
         if new_y > self.getLowerLimit():
             new_y = self.getLowerLimit()
         elif new_y < self.getUpperLimit():
             new_y = self.getUpperLimit()
-        self.element.move(0, new_y - self.getCenterY())
+        self.sprite.move(0, new_y - self.getCenterY())
     
     def draw(self):
-        self.element.draw(self.window)
+        self.sprite.draw(self.window)
 
     def undraw(self):
-        self.element.undraw()
+        self.sprite.undraw()
 
     def isAtBarLimit(self):
         if self.isAtUpperLimit() or self.isAtLowerLimit():
@@ -39,8 +37,11 @@ class BarEntity:
         return False
     
     def getCenterY(self):
-        return self.element.getAnchor().getY()
+        return self.sprite.getAnchor().getY()
     
+    def getHitboxMinAndMaxY(self):
+        return (self.getCenterY()-self.height/2, self.getCenterY()+self.height/2)
+
     def getLowerLimit(self):
         return 637 - self.height/2
     
@@ -51,4 +52,6 @@ class Cursor(BarEntity):
     pass
 class Fish(BarEntity):
     pass
+
+
         
