@@ -1,5 +1,6 @@
 import time
 import random
+import radio
 import graphics as gph
 import os, glob
 from PIL import Image as PILImage
@@ -46,6 +47,14 @@ def get_pos(key_click):
     y = key_click.getY()
     return x, y
 
+def play_random_music():
+    playlist = ["assets/audios/playlist/in-the-deep-woods.mp3",
+                "assets/audios/playlist/submarine-theme.mp3",
+                "assets/audios/playlist/the-wind-can-be-still.mp3"]
+
+    random.shuffle(playlist)
+    radio.play(playlist[0])
+
 def is_cursor_climbing(key):
     if key in ("SPACE", "UP"):
         return True
@@ -90,6 +99,8 @@ def title_screen():
     ou sair do jogo.
     """
 
+    radio.play("assets/audios/title-screen.mp3")
+
     game_started = False
 
     if not is_drawn(title):
@@ -108,18 +119,21 @@ def title_screen():
         fish.undraw()
         fishing_progress_bar.undraw()
 
-    while True:
-        click = win.checkMouse()
+    while win.isOpen():
+        # click = win.checkMouse()
         key = get_key()
 
-        if click:
-            print(get_pos(click))
-        elif key in ("ESCAPE", "Q"):
+        # if click:
+        #     print(get_pos(click))
+        if key in ("ESCAPE", "Q"):
+            radio.stop_all()
+            radio.play("assets/audios/sfx/exit.wav")
             win.close()
-            break
+            return
 
         if not game_started:
             if key in ("RETURN", "KP_ENTER"):
+                radio.play("assets/audios/sfx/enter.wav")
                 start_idle()
                 game_started = True
 
@@ -129,6 +143,13 @@ def start_idle():
     Aguarda um tempo aleatório até que um peixe seja fisgado
     e verifica se o jogador reage dentro do tempo limite.
     """
+
+    if radio.is_playing():
+        radio.stop_all()
+        play_random_music()
+        radio.play("assets/audios/sfx/reel.wav")
+        time.sleep(1)
+        radio.play("assets/audios/sfx/drop-water.wav")
 
     if not is_drawn(idle):
         idle.draw(win)
@@ -150,24 +171,27 @@ def start_idle():
     while True:
         key = get_key()
         if key in ("ESCAPE", "Q"):
+            radio.stop_all()
+            radio.play("assets/audios/sfx/exit.wav")
             title_screen()
-            break
+            return
 
         if time.time() >= detect_fish:
-            print("peixe fisgado")
-
+            radio.play("assets/audios/sfx/fish-bite.wav")
             exclamation.draw(win)
             delay = time.time() + 3
 
             while time.time() < delay:
                 key = get_key()
                 if key in ("ESCAPE", "Q"):
+                    radio.stop_all()
+                    radio.play("assets/audios/sfx/exit.wav")
                     title_screen()
-                    break
+                    return
                 elif key in ("SPACE", "UP"):
+                    radio.play("assets/audios/sfx/fish-hit.wav")
                     exclamation.undraw()
                     hitted = True
-                    print("foi")
                     break
             break
 
@@ -204,8 +228,10 @@ def start_fishing():
     while True:
         key = get_key()
         if key in ("ESCAPE", "Q"):
+            radio.stop_all()
+            radio.play("assets/audios/sfx/exit.wav")
             title_screen()
-            break
+            return
 
         gravity = 0.3
         if is_cursor_climbing(key):
@@ -226,7 +252,7 @@ def start_fishing():
         cursor.move(speed)
         time.sleep(1/60)
 
-        print(f"y={cursor.getCenterY():.2f},gravity={gravity},speed={speed},key={key}")
+        print(f"y={cursor.getCenterY():.2f},gravity={gravity},speed={speed:.2f},key={key}")
         if cursor_contact_with_fish():
             print("FISH CONTACT = True")
         else:
