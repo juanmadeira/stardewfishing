@@ -7,42 +7,29 @@ from entities import BarEntity, Cursor, Fish
 
 win = gph.GraphWin("Stardew Fishing", 1280, 720)
 
-# arquivos *-resized são temporários
-# e servem só pra ir alterando o tamanho sem precisar mexer num editor externo
-# assim que definidos, vão substituir tamanhos originais
 def resize(path, filename, format, width, height):
     image = PILImage.open(path)
     image = image.resize((width, height))
     image.save(f"assets/{filename}-resized.{format}")
     return image
 
-background = resize("assets/background.png", "background", "png", 1280, 720)
-title = resize("assets/title.png", "title", "png", 724, 331)
-start = resize("assets/start.png", "start", "png", 523, 57)
-gui = resize("assets/gui.png", "gui", "png", 152, 600)
-exclamation = resize("assets/exclamation.png", "exclamation", "png", 20, 56)
-hit = resize("assets/hit.png", "hit", "png", 185, 75)
-cursor_easy = resize("assets/cursor-easy.png", "cursor-easy", "png", 36, 201)
-cursor_medium = resize("assets/cursor-medium.png", "cursor-medium", "png", 36, 108)
-cursor_hard = resize("assets/cursor-hard.png", "cursor-hard", "png", 36, 36)
-fish = resize("assets/fish.png", "fish", "png", 32, 32)
-
-background = gph.Image(gph.Point(640, 360), "assets/background-resized.png")
-title = gph.Image(gph.Point(640, 200), "assets/title-resized.png")
-start = gph.Image(gph.Point(640, 600), "assets/start-resized.png")
-gui = gph.Image(gph.Point(1050, 360), "assets/gui-resized.png")
+background = gph.Image(gph.Point(640, 360), "assets/background.png")
+title = gph.Image(gph.Point(640, 200), "assets/title.png")
+start = gph.Image(gph.Point(640, 600), "assets/start.png")
+gui = gph.Image(gph.Point(1050, 360), "assets/gui.png")
 
 idle = gph.Image(gph.Point(625, 350), "assets/idle.png")
-exclamation = gph.Image(gph.Point(515, 295), "assets/exclamation-resized.png")
-hit = gph.Image(gph.Point(645, 265), "assets/hit-resized.png")
+exclamation = gph.Image(gph.Point(515, 295), "assets/exclamation.png")
+hit = gph.Image(gph.Point(645, 265), "assets/hit.png")
 
 fishing = gph.Image(gph.Point(625, 350), "assets/fishing.png")
-cursor_easy = gph.Image(gph.Point(1060, 520), "assets/cursor-easy-resized.png")
-cursor_medium = gph.Image(gph.Point(1060, 583), "assets/cursor-medium-resized.png")
-cursor_hard = gph.Image(gph.Point(1060, 619), "assets/cursor-hard-resized.png")
+cursor_easy = gph.Image(gph.Point(1060, 520), "assets/cursor-easy.png")
+cursor_medium = gph.Image(gph.Point(1060, 583), "assets/cursor-medium.png")
+cursor_hard = gph.Image(gph.Point(1060, 619), "assets/cursor-hard.png")
 fishing_progress_bar = gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270))
 fishing_progress_bar.setFill("green")
-fish = gph.Image(gph.Point(1060, 400), "assets/fish-resized.png")
+fish = gph.Image(gph.Point(1060, 400), "assets/fish.png")
+
 # TODO - select fishes with glob and randomize fish spawn
 
 def is_drawn(obj):
