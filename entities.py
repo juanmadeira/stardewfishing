@@ -52,6 +52,3 @@ class Cursor(BarEntity):
     pass
 class Fish(BarEntity):
     pass
-
-
-        

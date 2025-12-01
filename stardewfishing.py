@@ -20,40 +20,39 @@ background = resize("assets/background.png", "background", "png", 1280, 720)
 title = resize("assets/title.png", "title", "png", 724, 331)
 start = resize("assets/start.png", "start", "png", 523, 57)
 gui = resize("assets/gui.png", "gui", "png", 152, 600)
+exclamation = resize("assets/exclamation.png", "exclamation", "png", 20, 56)
+hit = resize("assets/hit.png", "hit", "png", 185, 75)
 cursor_easy = resize("assets/cursor-easy.png", "cursor-easy", "png", 36, 201)
 cursor_medium = resize("assets/cursor-medium.png", "cursor-medium", "png", 36, 108)
 cursor_hard = resize("assets/cursor-hard.png", "cursor-hard", "png", 36, 36)
+fish = resize("assets/fish.png", "fish", "png", 32, 32)
 
 background = gph.Image(gph.Point(640, 360), "assets/background-resized.png")
 title = gph.Image(gph.Point(640, 200), "assets/title-resized.png")
 start = gph.Image(gph.Point(640, 600), "assets/start-resized.png")
 gui = gph.Image(gph.Point(1050, 360), "assets/gui-resized.png")
 
+idle = gph.Image(gph.Point(625, 350), "assets/idle.png")
+exclamation = gph.Image(gph.Point(515, 295), "assets/exclamation-resized.png")
+hit = gph.Image(gph.Point(645, 265), "assets/hit-resized.png")
+
+fishing = gph.Image(gph.Point(625, 350), "assets/fishing.png")
 cursor_easy = gph.Image(gph.Point(1060, 520), "assets/cursor-easy-resized.png")
 cursor_medium = gph.Image(gph.Point(1060, 583), "assets/cursor-medium-resized.png")
 cursor_hard = gph.Image(gph.Point(1060, 619), "assets/cursor-hard-resized.png")
 fishing_progress_bar = gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270))
 fishing_progress_bar.setFill("green")
-fish = resize("assets/fish.png", "fish", "png", 32, 32)
-# TODO - select fishes with glob and randomize fish spawn
 fish = gph.Image(gph.Point(1060, 400), "assets/fish-resized.png")
-
-
-
-def get_difficulty():
-    return random.choice(["easy", "medium", "hard"])
+# TODO - select fishes with glob and randomize fish spawn
 
 def is_drawn(obj):
     return obj.canvas is not None
 
-def start_game():
-    if not is_drawn(gui):
-        title.undraw()
-        start.undraw()
-        gui.draw(win)
-        cursor.draw()
-        fish.draw()
-        fishing_progress_bar.draw(win)
+def get_difficulty():
+    return random.choice(["easy", "medium", "hard"])
+
+def get_key():
+    return win.checkKey().upper()
 
 def get_pos(key_click):
     x = key_click.getX()
@@ -61,7 +60,7 @@ def get_pos(key_click):
     return x, y
 
 def is_cursor_climbing(key):
-    if key == "SPACE" or key == "UP":
+    if key in ("SPACE", "UP"):
         return True
     return False
 
@@ -72,7 +71,8 @@ def cursor_contact_with_fish():
         return True
     return False
  
-def grow_progress_bar(fishing_progress_bar):
+def grow_progress_bar():
+    global fishing_progress_bar
     start_point = fishing_progress_bar.getP1()
     old_y = fishing_progress_bar.getP2().getY()
     new_y = old_y
@@ -87,37 +87,139 @@ def grow_progress_bar(fishing_progress_bar):
         fishing_progress_bar.draw(win)
     return fishing_progress_bar
 
-difficulty = get_difficulty()
+def reset_cursor():
+    """
+    Atualiza a dificuldade e recria o cursor global.
+    """
 
-cursors = {
-    "easy": cursor_easy,
-    "medium": cursor_medium,
-    "hard": cursor_hard
-}
+    global cursor
+    difficulty = get_difficulty()
+    cursor = Cursor(cursors[difficulty], win)
 
-cursor = Cursor(cursors[difficulty], win)
-fish = Fish(fish, win)
+def title_screen():
+    """
+    Exibe a tela inicial do jogo.
+    Limpa elementos anteriores, mostra o título e aguarda o jogador iniciar
+    ou sair do jogo.
+    """
 
-game_started = False
-speed = 0
+    game_started = False
 
-background.draw(win)
-title.draw(win)
-start.draw(win)
+    if not is_drawn(title):
+        title.draw(win)
+        start.draw(win)
 
-while True:
-    click = win.checkMouse()
-    key = win.checkKey()
-    key = key.upper()
-    if click:
-        print(get_pos(click))
+    if is_drawn(idle):
+        idle.undraw()
+        exclamation.undraw()
+        hit.undraw()
 
-    if not game_started:
-        if key == "RETURN" or key == "KP_ENTER":
-            start_game()
-            game_started = True
-    
+    if is_drawn(gui):
+        gui.undraw()
+        fishing.undraw()
+        cursor.undraw()
+        fish.undraw()
+        fishing_progress_bar.undraw()
+
+    while True:
+        click = win.checkMouse()
+        key = get_key()
+
+        if click:
+            print(get_pos(click))
+        elif key in ("ESCAPE", "Q"):
+            win.close()
+            break
+
+        if not game_started:
+            if key in ("RETURN", "KP_ENTER"):
+                start_idle()
+                game_started = True
+
+def start_idle():
+    """
+    Controla o estado parado do jogador.
+    Aguarda um tempo aleatório até que um peixe seja fisgado
+    e verifica se o jogador reage dentro do tempo limite.
+    """
+
+    if not is_drawn(idle):
+        idle.draw(win)
+
+    if is_drawn(title):
+        title.undraw()
+        start.undraw()
+
+    if is_drawn(gui):
+        gui.undraw()
+        fishing.undraw()
+        cursor.undraw()
+        fish.undraw()
+        fishing_progress_bar.undraw()
+
+    detect_fish = time.time() + random.uniform(2, 5)
+    hitted = False
+
+    while True:
+        key = get_key()
+        if key in ("ESCAPE", "Q"):
+            title_screen()
+            break
+
+        if time.time() >= detect_fish:
+            print("peixe fisgado")
+
+            exclamation.draw(win)
+            delay = time.time() + 3
+
+            while time.time() < delay:
+                key = get_key()
+                if key in ("ESCAPE", "Q"):
+                    title_screen()
+                    break
+                elif key in ("SPACE", "UP"):
+                    exclamation.undraw()
+                    hitted = True
+                    print("foi")
+                    break
+            break
+
+    exclamation.undraw()
+
+    if hitted:
+        hit.draw(win)
+        time.sleep(2.5)
+        hit.undraw()
+        start_fishing()
     else:
+        start_idle()
+
+def start_fishing():
+    """
+    Inicia o modo de pesca após o jogador acertar a fisgada.
+    """
+
+    reset_cursor()
+    global fishing_progress_bar
+
+    if not is_drawn(gui):
+        gui.draw(win)
+        fishing.draw(win)
+        cursor.draw()
+        fish.draw()
+        fishing_progress_bar.draw(win)
+
+    if is_drawn(idle):
+        idle.undraw()
+
+    speed = 0
+
+    while True:
+        key = get_key()
+        if key in ("ESCAPE", "Q"):
+            title_screen()
+            break
+
         gravity = 0.3
         if is_cursor_climbing(key):
             gravity = 0.5
@@ -132,12 +234,24 @@ while True:
                 speed = 0
                 gravity = 0
 
-
-        fishing_progress_bar = grow_progress_bar(fishing_progress_bar)
+        fishing_progress_bar = grow_progress_bar()
 
         cursor.move(speed)
         time.sleep(1/60)
-    
-    # print(f"y={cursor.getCenterY():.2f},gravity={gravity},speed={speed},key={key}")
-    if cursor_contact_with_fish():
-        print("CURSOR IN CONTACT WITH FISH")
+
+        print(f"y={cursor.getCenterY():.2f},gravity={gravity},speed={speed},key={key}")
+        if cursor_contact_with_fish():
+            print("FISH CONTACT = True")
+        else:
+            print("FISH CONTACT = False")
+
+cursors = {
+    "easy": cursor_easy,
+    "medium": cursor_medium,
+    "hard": cursor_hard
+}
+
+fish = Fish(fish, win)
+
+background.draw(win)
+title_screen()
