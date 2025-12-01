@@ -1,16 +1,15 @@
 # Stardew Fishing
 
-![Captura de tela do jogo Stardew Fishing](screenshot.png)
+<p align="center">
+    <img src="./screenshot-1.png" alt="Captura de tela de Stardew Fishing">
+</p>
 
 ## Descrição do Jogo
 Stardew Fishing é um jogo de pesca de _quick time event_ que utiliza da biblioteca [graphics](https://mcsp.wartburg.edu/zelle/python/graphics.py), onde o jogador deve capturar peixes em um ambiente inspirado no minigame de pesca de Stardew Valley, criado originalmente por Eric Barone (CorcernedApe). O objetivo principal é pescar peixes em uma barra com um cursor de pesca que se move de maneira fluida, atento à movimentação do peixe que acrescenta ao desafio.
 
+<br>
 <p align="center">
-    <img src="../assets/fishes/anchovy.png" width="30px">
-    <img src="../assets/fishes/carp.png" width="30px">
-    <img src="../assets/fishes/shad.png" width="30px">
-    <img src="../assets/fishes/sturgeon.png" width="30px">
-    <img src="../assets/fishes/tilapia.png" width="30px">
+    <img src="./screenshot-2.png" alt="Captura de tela de Stardew Fishing">
 </p>
 
 ## Controles
@@ -23,6 +22,14 @@ O cursor de pesca se comporta de forma fluida, movendo-se de acordo com a gravid
 ### Barra de progresso
 A barra de progresso é um indicador de quão próximo o jogador está de fisgar o peixe. Quanto mais tempo o cursor ficar em contato com o peixe, mais a barra vai se enchendo. Se o cursor perder o contato com o peixe, a barra de progresso começa a diminuir gradativamente. Se a barra chegar a zero, o peixe escapa e o jogador perde a captura.
 
+<p align="center">
+    <img src="../assets/fishes/anchovy.png" width="30px">
+    <img src="../assets/fishes/carp.png" width="30px">
+    <img src="../assets/fishes/catfish.png" width="30px">
+    <img src="../assets/fishes/herring.png" width="30px">
+    <img src="../assets/fishes/rainbow-trout.png.png" width="30px">
+</p>
+
 ## Dificuldade
 ### Raridade dos peixes
 Os peixes possuem raridades aleatórias, que influenciam tanto sua velocidade de movimento quanto a intensidade da oscilação. Peixes mais raros se movem de maneira mais imprevisível e difícil de capturar, o que aumenta a dificuldade do jogo.
@@ -34,11 +41,11 @@ O tamanho do cursor varia de acordo com a dificuldade do peixe. Quanto maior a d
 O objetivo do jogo é capturar o maior número possível de peixes, que são convertidos em um valor determinado por sua raridade.
 
 <p align="center">
-    <img src="../assets/fishes/catfish.png" width="30px">
-    <img src="../assets/fishes/herring.png" width="30px">
-    <img src="../assets/fishes/sardine.png" width="30px">
-    <img src="../assets/fishes/squid.png" width="30px">
     <img src="../assets/fishes/sunfish.png" width="30px">
+    <img src="../assets/fishes/herring.png" width="30px">
+    <img src="../assets/fishes/tilapia.png" width="30px">
+    <img src="../assets/fishes/sturgeon.png" width="30px">
+    <img src="../assets/fishes/salmon.png" width="30px">
 </p>
 
 ## Dependências
