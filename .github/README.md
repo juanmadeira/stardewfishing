@@ -27,7 +27,7 @@ A barra de progresso é um indicador de quão próximo o jogador está de fisgar
     <img src="../assets/fishes/carp.png" width="30px">
     <img src="../assets/fishes/catfish.png" width="30px">
     <img src="../assets/fishes/herring.png" width="30px">
-    <img src="../assets/fishes/rainbow-trout.png.png" width="30px">
+    <img src="../assets/fishes/rainbow-trout.png" width="30px">
 </p>
 
 ## Dificuldade
