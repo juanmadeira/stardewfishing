@@ -3,9 +3,11 @@ import random
 import radio
 import graphics as gph
 import os, glob
+from pathlib import Path
 from PIL import Image as PILImage
 from entities import BarEntity, Cursor, Fish
 
+basedir = Path(__file__).resolve().parent
 win = gph.GraphWin("Stardew Fishing", 1280, 720)
 
 def resize(path, filename, format, width, height):
@@ -14,46 +16,61 @@ def resize(path, filename, format, width, height):
     image.save(f"assets/{filename}-resized.{format}")
     return image
 
-background = gph.Image(gph.Point(640, 360), "assets/background.png")
-title = gph.Image(gph.Point(640, 200), "assets/title.png")
-start = gph.Image(gph.Point(640, 600), "assets/start.png")
-gui = gph.Image(gph.Point(1050, 360), "assets/gui.png")
+background = gph.Image(gph.Point(640, 360), basedir/"assets"/"background.png")
+title = gph.Image(gph.Point(640, 200), basedir/"assets"/"title.png")
+start = gph.Image(gph.Point(640, 600), basedir/"assets"/"start.png")
+gui = gph.Image(gph.Point(1050, 360), basedir/"assets"/"gui.png")
 
-idle = gph.Image(gph.Point(625, 350), "assets/idle.png")
-exclamation = gph.Image(gph.Point(515, 295), "assets/exclamation.png")
-hit = gph.Image(gph.Point(645, 265), "assets/hit.png")
+idle = gph.Image(gph.Point(625, 350), basedir/"assets/idle.png")
+exclamation = gph.Image(gph.Point(515, 295), basedir/"assets"/"exclamation.png")
+hit = gph.Image(gph.Point(645, 265), basedir/"assets"/"hit.png")
 
-fishing = gph.Image(gph.Point(625, 350), "assets/fishing.png")
-cursor_easy = gph.Image(gph.Point(1060, 520), "assets/cursor-easy.png")
-cursor_medium = gph.Image(gph.Point(1060, 583), "assets/cursor-medium.png")
-cursor_hard = gph.Image(gph.Point(1060, 619), "assets/cursor-hard.png")
+fishing = gph.Image(gph.Point(625, 350), basedir/"assets"/"fishing.png")
+cursor_easy = gph.Image(gph.Point(1060, 520), basedir/"assets"/"cursor-easy.png")
+cursor_medium = gph.Image(gph.Point(1060, 583), basedir/"assets"/"cursor-medium.png")
+cursor_hard = gph.Image(gph.Point(1060, 619), basedir/"assets"/"cursor-hard.png")
 fishing_progress_bar = gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270))
-# WORST COLOR -> red = 255, green = 50
-# BEST COLOR -> red = 127, green = 255
-# START COLOR -> red = 255, green = 172
+# BEST COLOR    -> red = 127, green = 255
+# START COLOR   -> red = 255, green = 172
+# WORST COLOR   -> red = 255, green = 50
 fp_red = 255
 fp_green = 172
 fishing_progress_bar.setFill(gph.color_rgb(fp_red,fp_green,0))
-fish = gph.Image(gph.Point(1060, 400), "assets/fish.png")
+fish = gph.Image(gph.Point(1060, 400), basedir/"assets"/"fish.png")
 
+#
 # TODO - select fishes with glob and randomize fish spawn
+#
+
+cursors = {
+    "easy": cursor_easy,
+    "medium": cursor_medium,
+    "hard": cursor_hard
+}
+
+fish = Fish(fish, win)
+background.draw(win)
 
 def is_drawn(obj):
     return obj.canvas is not None
 
 def get_difficulty():
+    """
+    Retorna a dificuldade do jogo escolhida aleatoriamente
+    """
     return random.choice(["easy", "medium", "hard"])
 
 def get_key():
+    """
+    Retorna a tecla pressionada pelo jogador.
+    """
     if win.isOpen():
         return win.checkKey().upper()
 
-def get_pos(key_click):
-    x = key_click.getX()
-    y = key_click.getY()
-    return x, y
-
 def play_random_music():
+    """
+    Toca uma música aleatória da playlist.
+    """
     playlist = ["assets/audios/playlist/in-the-deep-woods.mp3",
                 "assets/audios/playlist/submarine-theme.mp3",
                 "assets/audios/playlist/the-wind-can-be-still.mp3"]
@@ -61,12 +78,34 @@ def play_random_music():
     random.shuffle(playlist)
     radio.play(playlist[0])
 
+def exit(option):
+    """
+    Ao pressionar 'ESCAPE' ou 'Q'
+    redireciona para a tela inicial ou fecha o jogo.
+    """
+    if option == "title":
+        radio.stop_all()
+        radio.play("assets/audios/sfx/exit.wav")
+        title_screen()
+        return
+    if option == "close":
+        radio.stop_all()
+        radio.play("assets/audios/sfx/exit.wav")
+        win.close()
+        return
+
 def is_cursor_climbing(key):
+    """
+    Verifica se o cursor está subindo ou descendo
+    """
     if key in ("SPACE", "UP"):
         return True
     return False
 
 def cursor_contact_with_fish():
+    """
+    Verifica se o cursor está em contato com o peixe.
+    """
     fish_min_y, fish_max_y = fish.getHitboxMinAndMaxY()
     cursor_min_y, cursor_max_y = cursor.getHitboxMinAndMaxY()
     if cursor_min_y >= fish_min_y and fish_max_y >= cursor_min_y or cursor_max_y >= fish_min_y and cursor_min_y <= fish_min_y:
@@ -74,6 +113,9 @@ def cursor_contact_with_fish():
     return False
  
 def grow_progress_bar():
+    """
+    Atualiza a barra de progresso de pesca.
+    """
     global fishing_progress_bar
     global fp_green
     global fp_red
@@ -126,7 +168,6 @@ def reset_cursor():
     """
     Atualiza a dificuldade e recria o cursor global.
     """
-
     global cursor
     difficulty = get_difficulty()
     cursor = Cursor(cursors[difficulty], win)
@@ -137,7 +178,6 @@ def title_screen():
     Limpa elementos anteriores, mostra o título e aguarda o jogador iniciar
     ou sair do jogo.
     """
-
     radio.play("assets/audios/title-screen.mp3")
 
     game_started = False
@@ -160,12 +200,8 @@ def title_screen():
 
     while win.isOpen():
         key = get_key()
-
         if key in ("ESCAPE", "Q"):
-            radio.stop_all()
-            radio.play("assets/audios/sfx/exit.wav")
-            win.close()
-            return
+            exit("close")
 
         if not game_started:
             if key in ("RETURN", "KP_ENTER"):
@@ -179,10 +215,10 @@ def start_idle():
     Aguarda um tempo aleatório até que um peixe seja fisgado
     e verifica se o jogador reage dentro do tempo limite.
     """
-
     if win.isClosed():
         radio.stop_all()
         return
+    
     if radio.is_playing():
         radio.stop_all()
         play_random_music()
@@ -210,10 +246,7 @@ def start_idle():
     while win.isOpen():
         key = get_key()
         if key in ("ESCAPE", "Q"):
-            radio.stop_all()
-            radio.play("assets/audios/sfx/exit.wav")
-            title_screen()
-            return
+            exit("title")
 
         if time.time() >= detect_fish:
             radio.play("assets/audios/sfx/fish-bite.wav")
@@ -223,13 +256,9 @@ def start_idle():
             while time.time() < delay:
                 key = get_key()
                 if key in ("ESCAPE", "Q"):
-                    radio.stop_all()
-                    radio.play("assets/audios/sfx/exit.wav")
-                    title_screen()
-                    return
+                    exit("title")
                 elif key in ("SPACE", "UP"):
                     radio.play("assets/audios/sfx/fish-hit.wav")
-                    exclamation.undraw()
                     hitted = True
                     break
             break
@@ -248,7 +277,6 @@ def start_fishing():
     """
     Inicia o modo de pesca após o jogador acertar a fisgada.
     """
-
     if win.isClosed():
         radio.stop_all()
         return
@@ -271,10 +299,7 @@ def start_fishing():
     while win.isOpen():
         key = get_key()
         if key in ("ESCAPE", "Q"):
-            radio.stop_all()
-            radio.play("assets/audios/sfx/exit.wav")
-            title_screen()
-            return
+            exit("title")
 
         gravity = 0.3
         if is_cursor_climbing(key):
@@ -296,14 +321,7 @@ def start_fishing():
         cursor.move(speed)
         time.sleep(1/60)
 
-cursors = {
-    "easy": cursor_easy,
-    "medium": cursor_medium,
-    "hard": cursor_hard
-}
-
-fish = Fish(fish, win)
-background.draw(win)
+# inicializa o jogo
 title_screen()
 
 if win.isClosed():
