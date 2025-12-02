@@ -13,7 +13,7 @@ win = gph.GraphWin("Stardew Fishing", 1280, 720)
 def resize(path, filename, format, width, height):
     image = PILImage.open(path)
     image = image.resize((width, height))
-    image.save(f"assets/{filename}-resized.{format}")
+    image.save(f'{basedir}/"assets"/"{filename}-resized.{format}"')
     return image
 
 background = gph.Image(gph.Point(640, 360), basedir/"assets"/"background.png")
@@ -71,9 +71,9 @@ def play_random_music():
     """
     Toca uma música aleatória da playlist.
     """
-    playlist = ["assets/audios/playlist/in-the-deep-woods.mp3",
-                "assets/audios/playlist/submarine-theme.mp3",
-                "assets/audios/playlist/the-wind-can-be-still.mp3"]
+    playlist = [basedir/"assets"/"audios"/"playlist"/"in-the-deep-woods.mp3",
+                basedir/"assets"/"audios"/"playlist"/"submarine-theme.mp3",
+                basedir/"assets"/"audios"/"playlist"/"the-wind-can-be-still.mp3"]
 
     random.shuffle(playlist)
     radio.play(playlist[0])
@@ -83,14 +83,13 @@ def exit(option):
     Ao pressionar 'ESCAPE' ou 'Q'
     redireciona para a tela inicial ou fecha o jogo.
     """
+    radio.stop_all()
+    radio.play(basedir/"assets"/"audios"/"sfx"/"exit.wav")
     if option == "title":
-        radio.stop_all()
-        radio.play("assets/audios/sfx/exit.wav")
         title_screen()
         return
     if option == "close":
-        radio.stop_all()
-        radio.play("assets/audios/sfx/exit.wav")
+        time.sleep(0.25)
         win.close()
         return
 
@@ -178,7 +177,7 @@ def title_screen():
     Limpa elementos anteriores, mostra o título e aguarda o jogador iniciar
     ou sair do jogo.
     """
-    radio.play("assets/audios/title-screen.mp3")
+    radio.play(basedir/"assets"/"audios"/"title-screen.mp3")
 
     game_started = False
 
@@ -205,9 +204,8 @@ def title_screen():
 
         if not game_started:
             if key in ("RETURN", "KP_ENTER"):
-                radio.play("assets/audios/sfx/enter.wav")
-                start_idle()
                 game_started = True
+                start_idle()
 
 def start_idle():
     """
@@ -222,9 +220,10 @@ def start_idle():
     if radio.is_playing():
         radio.stop_all()
         play_random_music()
-        radio.play("assets/audios/sfx/reel.wav")
-        time.sleep(1)
-        radio.play("assets/audios/sfx/drop-water.wav")
+        radio.play(basedir/"assets"/"audios"/"sfx"/"enter.wav")
+        radio.play(basedir/"assets"/"audios"/"sfx"/"reel.wav")
+        time.sleep(2)
+        radio.play(basedir/"assets"/"audios"/"sfx"/"drop-water.wav")
 
     if not is_drawn(idle):
         idle.draw(win)
@@ -249,7 +248,7 @@ def start_idle():
             exit("title")
 
         if time.time() >= detect_fish:
-            radio.play("assets/audios/sfx/fish-bite.wav")
+            radio.play(basedir/"assets"/"audios"/"sfx"/"fish-bite.wav")
             exclamation.draw(win)
             delay = time.time() + 3
 
@@ -258,7 +257,7 @@ def start_idle():
                 if key in ("ESCAPE", "Q"):
                     exit("title")
                 elif key in ("SPACE", "UP"):
-                    radio.play("assets/audios/sfx/fish-hit.wav")
+                    radio.play(basedir/"assets"/"audios"/"sfx"/"fish-hit.wav")
                     hitted = True
                     break
             break
