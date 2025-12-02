@@ -177,6 +177,11 @@ def title_screen():
     Limpa elementos anteriores, mostra o título e aguarda o jogador iniciar
     ou sair do jogo.
     """
+
+    if win.isClosed():
+        radio.stop_all()
+        return
+
     radio.play(basedir/"assets"/"audios"/"title-screen.mp3")
 
     game_started = False
