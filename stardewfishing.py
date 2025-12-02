@@ -28,7 +28,12 @@ cursor_easy = gph.Image(gph.Point(1060, 520), "assets/cursor-easy.png")
 cursor_medium = gph.Image(gph.Point(1060, 583), "assets/cursor-medium.png")
 cursor_hard = gph.Image(gph.Point(1060, 619), "assets/cursor-hard.png")
 fishing_progress_bar = gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270))
-fishing_progress_bar.setFill("green")
+# WORST COLOR -> red = 255, green = 50
+# BEST COLOR -> red = 127, green = 255
+# START COLOR -> red = 255, green = 172
+fp_red = 255
+fp_green = 172
+fishing_progress_bar.setFill(gph.color_rgb(fp_red,fp_green,0))
 fish = gph.Image(gph.Point(1060, 400), "assets/fish.png")
 
 # TODO - select fishes with glob and randomize fish spawn
@@ -40,7 +45,8 @@ def get_difficulty():
     return random.choice(["easy", "medium", "hard"])
 
 def get_key():
-    return win.checkKey().upper()
+    if win.isOpen():
+        return win.checkKey().upper()
 
 def get_pos(key_click):
     x = key_click.getX()
@@ -69,18 +75,51 @@ def cursor_contact_with_fish():
  
 def grow_progress_bar():
     global fishing_progress_bar
+    global fp_green
+    global fp_red
+    color_step = 3
+    
     start_point = fishing_progress_bar.getP1()
     old_y = fishing_progress_bar.getP2().getY()
     new_y = old_y
-    if cursor_contact_with_fish() and old_y >= 75:
-        new_y = old_y - 5
+
+    if cursor_contact_with_fish():
+        if old_y >= 70:
+            new_y = old_y - 5
+            if fp_green + color_step < 255:
+                fp_green += color_step
+            elif fp_red - color_step > 127:
+                fp_red -= color_step
+            
     elif old_y <= 640:
         new_y = old_y + 5
+        if fp_red + color_step < 255:
+            fp_red += color_step
+        elif fp_green - color_step > 50:
+            fp_green -= color_step
+    
+    if fp_green + color_step > 255:
+        fp_green = 255
+    if fp_green - color_step < 50:
+        fp_green = 50
+    if fp_red + color_step > 255:
+        fp_red = 255
+    if fp_red - color_step < 127:
+        fp_red = 127
+
     if new_y != old_y:
+        progress_bar_placeholder = fishing_progress_bar.clone()
+        progress_bar_placeholder.draw(win)
         fishing_progress_bar.undraw()
+        if new_y < 70:
+            new_y = 70
+        if new_y > 640:
+            new_y = 640 
         fishing_progress_bar = gph.Rectangle(start_point, gph.Point(1115, new_y))
-        fishing_progress_bar.setFill("green")
+        fishing_progress_bar.setFill(gph.color_rgb(fp_red, fp_green, 0))
         fishing_progress_bar.draw(win)
+        progress_bar_placeholder.undraw()
+
     return fishing_progress_bar
 
 def reset_cursor():
@@ -120,11 +159,8 @@ def title_screen():
         fishing_progress_bar.undraw()
 
     while win.isOpen():
-        # click = win.checkMouse()
         key = get_key()
 
-        # if click:
-        #     print(get_pos(click))
         if key in ("ESCAPE", "Q"):
             radio.stop_all()
             radio.play("assets/audios/sfx/exit.wav")
@@ -144,6 +180,9 @@ def start_idle():
     e verifica se o jogador reage dentro do tempo limite.
     """
 
+    if win.isClosed():
+        radio.stop_all()
+        return
     if radio.is_playing():
         radio.stop_all()
         play_random_music()
@@ -168,7 +207,7 @@ def start_idle():
     detect_fish = time.time() + random.uniform(2, 5)
     hitted = False
 
-    while True:
+    while win.isOpen():
         key = get_key()
         if key in ("ESCAPE", "Q"):
             radio.stop_all()
@@ -210,6 +249,10 @@ def start_fishing():
     Inicia o modo de pesca após o jogador acertar a fisgada.
     """
 
+    if win.isClosed():
+        radio.stop_all()
+        return
+
     reset_cursor()
     global fishing_progress_bar
 
@@ -225,7 +268,7 @@ def start_fishing():
 
     speed = 0
 
-    while True:
+    while win.isOpen():
         key = get_key()
         if key in ("ESCAPE", "Q"):
             radio.stop_all()
@@ -247,16 +290,11 @@ def start_fishing():
                 speed = 0
                 gravity = 0
 
-        fishing_progress_bar = grow_progress_bar()
+        if win.isOpen():
+            fishing_progress_bar = grow_progress_bar()
 
         cursor.move(speed)
         time.sleep(1/60)
-
-        print(f"y={cursor.getCenterY():.2f},gravity={gravity},speed={speed:.2f},key={key}")
-        if cursor_contact_with_fish():
-            print("FISH CONTACT = True")
-        else:
-            print("FISH CONTACT = False")
 
 cursors = {
     "easy": cursor_easy,
@@ -265,6 +303,8 @@ cursors = {
 }
 
 fish = Fish(fish, win)
-
 background.draw(win)
 title_screen()
+
+if win.isClosed():
+    radio.stop_all()
