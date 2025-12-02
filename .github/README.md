@@ -50,7 +50,7 @@ O objetivo do jogo é capturar o maior número possível de peixes, que são con
 
 ## Dependências
 ```shell
-python python-tk
+python python-tk ffmpeg
 ```
 
 ## Como instalar
