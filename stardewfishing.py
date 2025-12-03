@@ -5,7 +5,7 @@ import graphics as gph
 import os, glob
 from pathlib import Path
 from PIL import Image as PILImage
-from entities import BarEntity, Cursor, Fish
+from entities import Cursor, Fish, ProgressBar
 
 basedir = Path(__file__).resolve().parent
 win = gph.GraphWin("Stardew Fishing", 1280, 720)
@@ -29,14 +29,8 @@ fishing = gph.Image(gph.Point(625, 350), basedir/"assets"/"fishing.png")
 cursor_easy = gph.Image(gph.Point(1060, 520), basedir/"assets"/"cursor-easy.png")
 cursor_medium = gph.Image(gph.Point(1060, 583), basedir/"assets"/"cursor-medium.png")
 cursor_hard = gph.Image(gph.Point(1060, 619), basedir/"assets"/"cursor-hard.png")
-fishing_progress_bar = gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270))
-# BEST COLOR    -> red = 127, green = 255
-# START COLOR   -> red = 255, green = 172
-# WORST COLOR   -> red = 255, green = 50
-fp_red = 255
-fp_green = 172
-fishing_progress_bar.setFill(gph.color_rgb(fp_red,fp_green,0))
 fish = gph.Image(gph.Point(1060, 400), basedir/"assets"/"fish.png")
+fish = Fish(fish, win)
 
 #
 # TODO - select fishes with glob and randomize fish spawn
@@ -48,7 +42,6 @@ cursors = {
     "hard": cursor_hard
 }
 
-fish = Fish(fish, win)
 background.draw(win)
 
 def is_drawn(obj):
@@ -71,9 +64,9 @@ def play_random_music():
     """
     Toca uma música aleatória da playlist.
     """
-    playlist = [basedir/"assets"/"audios"/"playlist"/"in-the-deep-woods.mp3",
-                basedir/"assets"/"audios"/"playlist"/"submarine-theme.mp3",
-                basedir/"assets"/"audios"/"playlist"/"the-wind-can-be-still.mp3"]
+    playlist = [basedir/"assets"/"audios"/"playlist"/"in-the-deep-woods.wav",
+                basedir/"assets"/"audios"/"playlist"/"submarine-theme.wav",
+                basedir/"assets"/"audios"/"playlist"/"the-wind-can-be-still.wav"]
 
     random.shuffle(playlist)
     radio.play(playlist[0])
@@ -101,68 +94,6 @@ def is_cursor_climbing(key):
         return True
     return False
 
-def cursor_contact_with_fish():
-    """
-    Verifica se o cursor está em contato com o peixe.
-    """
-    fish_min_y, fish_max_y = fish.getHitboxMinAndMaxY()
-    cursor_min_y, cursor_max_y = cursor.getHitboxMinAndMaxY()
-    if cursor_min_y >= fish_min_y and fish_max_y >= cursor_min_y or cursor_max_y >= fish_min_y and cursor_min_y <= fish_min_y:
-        return True
-    return False
- 
-def grow_progress_bar():
-    """
-    Atualiza a barra de progresso de pesca.
-    """
-    global fishing_progress_bar
-    global fp_green
-    global fp_red
-    color_step = 3
-    
-    start_point = fishing_progress_bar.getP1()
-    old_y = fishing_progress_bar.getP2().getY()
-    new_y = old_y
-
-    if cursor_contact_with_fish():
-        if old_y >= 70:
-            new_y = old_y - 5
-            if fp_green + color_step < 255:
-                fp_green += color_step
-            elif fp_red - color_step > 127:
-                fp_red -= color_step
-            
-    elif old_y <= 640:
-        new_y = old_y + 5
-        if fp_red + color_step < 255:
-            fp_red += color_step
-        elif fp_green - color_step > 50:
-            fp_green -= color_step
-    
-    if fp_green + color_step > 255:
-        fp_green = 255
-    if fp_green - color_step < 50:
-        fp_green = 50
-    if fp_red + color_step > 255:
-        fp_red = 255
-    if fp_red - color_step < 127:
-        fp_red = 127
-
-    if new_y != old_y:
-        progress_bar_placeholder = fishing_progress_bar.clone()
-        progress_bar_placeholder.draw(win)
-        fishing_progress_bar.undraw()
-        if new_y < 70:
-            new_y = 70
-        if new_y > 640:
-            new_y = 640 
-        fishing_progress_bar = gph.Rectangle(start_point, gph.Point(1115, new_y))
-        fishing_progress_bar.setFill(gph.color_rgb(fp_red, fp_green, 0))
-        fishing_progress_bar.draw(win)
-        progress_bar_placeholder.undraw()
-
-    return fishing_progress_bar
-
 def reset_cursor():
     """
     Atualiza a dificuldade e recria o cursor global.
@@ -182,7 +113,7 @@ def title_screen():
         radio.stop_all()
         return
 
-    radio.play(basedir/"assets"/"audios"/"title-screen.mp3")
+    radio.play(basedir/"assets"/"audios"/"title-screen.wav")
 
     game_started = False
 
@@ -200,7 +131,7 @@ def title_screen():
         fishing.undraw()
         cursor.undraw()
         fish.undraw()
-        fishing_progress_bar.undraw()
+        progress_bar.undraw()
 
     while win.isOpen():
         key = get_key()
@@ -242,7 +173,9 @@ def start_idle():
         fishing.undraw()
         cursor.undraw()
         fish.undraw()
-        fishing_progress_bar.undraw()
+        ## TODO encapsular o arquivo principal do jogo em uma classe pra essa merda funcionar
+        ## OU ENTÃO CORRIGIR ESSA MERDA DE OUTRO JEITO
+        progress_bar.undraw()
 
     detect_fish = time.time() + random.uniform(2, 5)
     hitted = False
@@ -286,15 +219,15 @@ def start_fishing():
         return
 
     reset_cursor()
-    global fishing_progress_bar
+    progress_bar = ProgressBar(gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270)), win, fish, cursor)
 
     if not is_drawn(gui):
         gui.draw(win)
         fishing.draw(win)
         cursor.draw()
         fish.draw()
-        fishing_progress_bar.draw(win)
-
+        progress_bar.draw()
+        
     if is_drawn(idle):
         idle.undraw()
 
@@ -320,7 +253,9 @@ def start_fishing():
                 gravity = 0
 
         if win.isOpen():
-            fishing_progress_bar = grow_progress_bar()
+            progress_bar.growProgressBar()
+        
+        fish.horizontalFlick()
 
         cursor.move(speed)
         time.sleep(1/60)
