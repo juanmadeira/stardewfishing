@@ -61,7 +61,6 @@ class Fish(BarEntity):
         self.lastHorizontalFlick = 2
 
     def horizontalFlick(self):
-        time.sleep(0.2)
         self.sprite.move(self.lastHorizontalFlick, 0)
         self.lastHorizontalFlick *= -1
 
