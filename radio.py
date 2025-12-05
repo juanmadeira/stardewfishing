@@ -43,7 +43,6 @@ def _play_one_file_blocking(filename):
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
-        print(_current_proc)
         _current_proc.wait()
         return
 
