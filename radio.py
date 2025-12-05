@@ -7,6 +7,7 @@ _STOP_FLAG = False
 _current_proc = None
 _lock = threading.Lock()
 
+has_ffmpeg = subprocess.run(["which", "ffmpeg"], capture_output=True, text=True)
 
 def _play_one_file_blocking(filename):
     global _STOP_FLAG, _current_proc
@@ -30,37 +31,26 @@ def _play_one_file_blocking(filename):
         return
 
     elif system == "Linux":
-        _current_proc = subprocess.Popen(
-            ["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", filename],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
+        if has_ffmpeg.returncode == 0:
+            _current_proc = subprocess.Popen(
+                ["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", filename],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+        else:
+            _current_proc = subprocess.Popen(
+                ["aplay", filename],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+        print(_current_proc)
         _current_proc.wait()
         return
-
-
-def _sequence_logic(file_list):
-    global _STOP_FLAG
-    _STOP_FLAG = False
-
-    for filename in file_list:
-        if _STOP_FLAG:
-            break
-        _play_one_file_blocking(filename)
-
 
 def play(filename):
     t = threading.Thread(target=_play_one_file_blocking, args=(filename,))
     t.daemon = True
     t.start()
-
-
-def play_sequence(file_list):
-    t = threading.Thread(target=_sequence_logic, args=(file_list,))
-    t.daemon = True
-    t.start()
-    return t
-
 
 def stop_all():
     global _STOP_FLAG, _current_proc
@@ -84,8 +74,10 @@ def stop_all():
         os.system("killall afplay 2>/dev/null")
 
     elif system == "Linux":
-        os.system("killall ffplay 2>/dev/null")
-
+        if has_ffmpeg.returncode == 0:
+            os.system("killall ffplay 2>/dev/null")
+        else:
+            os.system("killall aplay 2>/dev/null")
 
 def is_playing():
     global _current_proc
