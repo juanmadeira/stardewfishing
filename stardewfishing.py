@@ -4,11 +4,11 @@ import radio
 import graphics as gph
 import os, glob
 from pathlib import Path
-from PIL import Image as PILImage
+from PIL import Image as PILImage, ImageTk
 from entities import Cursor, Fish, ProgressBar
 
 basedir = Path(__file__).resolve().parent
-win = gph.GraphWin("Stardew Fishing", 1280, 720)
+win = gph.GraphWin("Stardew Fishing", 1280, 720, autoflush=False)
 
 def resize(path, filename, format, width, height):
     image = PILImage.open(path)
@@ -16,7 +16,6 @@ def resize(path, filename, format, width, height):
     image.save(f'{basedir}/"assets"/"{filename}-resized.{format}"')
     return image
 
-background = gph.Image(gph.Point(640, 360), basedir/"assets"/"background.png")
 title = gph.Image(gph.Point(640, 200), basedir/"assets"/"title.png")
 start = gph.Image(gph.Point(640, 600), basedir/"assets"/"start.png")
 gui = gph.Image(gph.Point(1050, 360), basedir/"assets"/"gui.png")
@@ -42,28 +41,32 @@ cursors = {
     "hard": cursor_hard
 }
 
-background.draw(win)
+gif = PILImage.open(basedir/"assets"/"background.gif")
+gif.seek(0)
+frames = []
+for i in range(gif.n_frames):
+    gif.seek(i)
+    frame = gif.copy().resize((1280, 720), PILImage.NEAREST)
+    frames.append(ImageTk.PhotoImage(frame))
+bg = win.create_image(0, 0, anchor="nw", image=frames[0])
+
+state = {"i": 0}
+def background():
+    win.itemconfig(bg, image=frames[state["i"]])
+    state["i"] = (state["i"] + 1) % len(frames)
+    win.master.after(120, background)
 
 def is_drawn(obj):
     return obj.canvas is not None
 
 def get_difficulty():
-    """
-    Retorna a dificuldade do jogo escolhida aleatoriamente
-    """
     return random.choice(["easy", "medium", "hard"])
 
 def get_key():
-    """
-    Retorna a tecla pressionada pelo jogador.
-    """
     if win.isOpen():
         return win.checkKey().upper()
 
 def play_random_music():
-    """
-    Toca uma música aleatória da playlist.
-    """
     playlist = [basedir/"assets"/"audios"/"playlist"/"in-the-deep-woods.wav",
                 basedir/"assets"/"audios"/"playlist"/"submarine-theme.wav",
                 basedir/"assets"/"audios"/"playlist"/"the-wind-can-be-still.wav"]
@@ -72,10 +75,6 @@ def play_random_music():
     radio.play(playlist[0])
 
 def exit(option):
-    """
-    Ao pressionar 'ESCAPE' ou 'Q'
-    redireciona para a tela inicial ou fecha o jogo.
-    """
     radio.stop_all()
     radio.play(basedir/"assets"/"audios"/"sfx"/"exit.wav")
     if option == "title":
@@ -87,28 +86,16 @@ def exit(option):
         return
 
 def is_cursor_climbing(key):
-    """
-    Verifica se o cursor está subindo ou descendo
-    """
     if key in ("SPACE", "UP"):
         return True
     return False
 
 def reset_cursor():
-    """
-    Atualiza a dificuldade e recria o cursor global.
-    """
     global cursor
     difficulty = get_difficulty()
     cursor = Cursor(cursors[difficulty], win)
 
 def title_screen():
-    """
-    Exibe a tela inicial do jogo.
-    Limpa elementos anteriores, mostra o título e aguarda o jogador iniciar
-    ou sair do jogo.
-    """
-
     if win.isClosed():
         radio.stop_all()
         return
@@ -144,11 +131,6 @@ def title_screen():
                 start_idle()
 
 def start_idle():
-    """
-    Controla o estado parado do jogador.
-    Aguarda um tempo aleatório até que um peixe seja fisgado
-    e verifica se o jogador reage dentro do tempo limite.
-    """
     if win.isClosed():
         radio.stop_all()
         return
@@ -173,8 +155,6 @@ def start_idle():
         fishing.undraw()
         cursor.undraw()
         fish.undraw()
-        ## TODO encapsular o arquivo principal do jogo em uma classe pra essa merda funcionar
-        ## OU ENTÃO CORRIGIR ESSA MERDA DE OUTRO JEITO
         progress_bar.undraw()
 
     detect_fish = time.time() + random.uniform(2, 5)
@@ -211,14 +191,12 @@ def start_idle():
         start_idle()
 
 def start_fishing():
-    """
-    Inicia o modo de pesca após o jogador acertar a fisgada.
-    """
     if win.isClosed():
         radio.stop_all()
         return
 
     reset_cursor()
+    global progress_bar
     progress_bar = ProgressBar(gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270)), win, fish, cursor)
 
     if not is_drawn(gui):
@@ -260,7 +238,7 @@ def start_fishing():
         cursor.move(speed)
         time.sleep(1/60)
 
-# inicializa o jogo
+background()
 title_screen()
 
 if win.isClosed():

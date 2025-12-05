@@ -1,7 +1,7 @@
 # Stardew Fishing
 
 <p align="center">
-    <img src="./screenshot-1.png" alt="Captura de tela de Stardew Fishing">
+    <img src="../assets/title.png" alt="Logo de Stardew Fishing">
 </p>
 
 ## Descrição do Jogo
@@ -9,7 +9,7 @@ Stardew Fishing é um jogo de pesca de _quick time event_ que utiliza da bibliot
 
 <br>
 <p align="center">
-    <img src="./screenshot-2.png" alt="Captura de tela de Stardew Fishing">
+    <img src="./screenshot.png" alt="Captura de tela de Stardew Fishing">
 </p>
 
 ## Controles

@@ -77,9 +77,6 @@ class ProgressBar():
         self.placeholder = None
 
     def growProgressBar(self):
-        """
-        Atualiza a barra de progresso de pesca.
-        """
         if self.getNewY() != self.getOldY():
             self.spawnPlaceholderFishingBar()
             self.updatePosition()
@@ -92,9 +89,6 @@ class ProgressBar():
         return False
 
     def isCursorInContactWithFish(self):
-        """
-        Verifica se o cursor está em contato com o peixe.
-        """
         fish_min_y, fish_max_y = self.fish.getHitboxMinAndMaxY()
         cursor_min_y, cursor_max_y = self.cursor.getHitboxMinAndMaxY()
         if cursor_min_y >= fish_min_y and fish_max_y >= cursor_min_y or cursor_max_y >= fish_min_y and cursor_min_y <= fish_min_y:
