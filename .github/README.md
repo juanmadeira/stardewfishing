@@ -57,5 +57,8 @@ python python-tk ffmpeg
 ```shell
 git clone https://github.com/juanmadeira/stardewfishing
 cd stardewfishing
+python -m venv .venv
+source .venv/bin/active
+pip install pillow
 python stardewfishing.py
 ```
