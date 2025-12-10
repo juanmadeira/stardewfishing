@@ -14,9 +14,6 @@ class IdleScene:
         self.exclamation = Sprite(gph.Image(gph.Point(515, 295), self.game.assets/"exclamation.png"), self.game.win)
         self.hit = Sprite(gph.Image(gph.Point(645, 265), self.game.assets/"hit.png"), self.game.win)
 
-        self.detect_fish = 0
-        self.hitted = False
-
     def enter_scene(self, from_title=False):
         if from_title:
             radio.play(self.game.assets/"audios"/"sfx"/"enter.wav")
@@ -25,7 +22,9 @@ class IdleScene:
             self.play_random_music()
 
         self.idle.draw()
-        self.detect_fish = time.time() + random.uniform(2, 5)
+        self.hitted = False
+        self.fish_detected = False
+        self.detect_time = time.time() + random.uniform(2, 5)
 
     def play_random_music(self):
         playlist = [
@@ -42,25 +41,27 @@ class IdleScene:
         self.hit.undraw()
 
     def update(self, key):
-        if time.time() >= self.detect_fish:
+        if time.time() >= self.detect_time and not getattr(self, "fish_detected"):
             radio.play(self.game.assets/"audios"/"sfx"/"fish-bite.wav")
             self.exclamation.draw()
+            self.fish_detected = True
 
-            react_time = time.time() + 3
-            while time.time() < react_time and self.game.win.isOpen():
-                key = self.game.win.checkKey().upper()
-                if key in ("SPACE", "UP"):
-                    self.hitted = True
-                    break
+        if getattr(self, "fish_detected"):
+            self.reaction_time = time.time() + 3
+            
+            if key in ("SPACE", "UP"):
+                self.hitted = True
+                self.hit_time = time.time()
+                self.exclamation.undraw()
+            if time.time() >= time.time() + self.reaction_time:
+                self.exclamation.undraw()
+                return self.game.change_scene("idle")
 
-            self.exclamation.undraw()
-
-            if self.hitted:
-                self.hit.draw()
+        if getattr(self, "hitted"):
+            if not self.hit.is_drawn():
                 radio.play(self.game.assets/"audios"/"sfx"/"fish-hit.wav")
-                time.sleep(2.5)
+                self.hit.draw()
+
+            if time.time() >= self.hit_time + 2:
                 self.hit.undraw()
                 return self.game.change_scene("fishing")
-            else:
-                # TODO: fix music restarting when fish escapes
-                return self.game.change_scene("idle")

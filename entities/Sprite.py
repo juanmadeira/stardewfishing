@@ -10,3 +10,6 @@ class Sprite:
 
     def undraw(self):
         self.sprite.undraw()
+
+    def is_drawn(self):
+        return self.sprite.canvas is not None
