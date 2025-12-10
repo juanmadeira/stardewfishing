@@ -1,7 +1,7 @@
 from lib import graphics as gph
-from entities import BarEntity
+from entities import Entity
 
-class Fish(BarEntity):
+class Fish(Entity):
     def __init__(self, sprite: gph.Image, window: gph.GraphWin):
         super().__init__(sprite, window)
         self.lastHorizontalFlick = 2

@@ -1,10 +1,9 @@
 from lib import graphics as gph
-from entities import Fish, Cursor
+from entities import Entity, Fish, Cursor
 
-class ProgressBar():
+class ProgressBar(Entity):
     def __init__(self, sprite: gph.Rectangle, window: gph.GraphWin, fish: Fish, cursor: Cursor):
-        self.sprite = sprite
-        self.window = window
+        super().__init__(sprite, window)
         self.fish = fish
         self.cursor = cursor
         self.redValue = 255
@@ -53,12 +52,6 @@ class ProgressBar():
 
         return new_bar
     
-    def draw(self):
-        self.sprite.draw(self.window)
-    
-    def undraw(self):
-        self.sprite.undraw()
-
     def setSprite(self, newSprite):
         self.sprite = newSprite
 
@@ -110,27 +103,7 @@ class ProgressBar():
             red = 127
         
         return (red, green)
-
-    # def getNewRedValue(self):
-    #     if not self.isGoingUp():
-    #         if self.getRedValue() + self.colorStep >= 255:
-    #             return 255
-    #         return self.getRedValue() + self.colorStep
-    #     if self.getRedValue() - self.colorStep <= 127:
-    #         return 127
-    #     if self.getGreenValue() == 255:
-    #         return self.getRedValue() - self.colorStep
-            
-    # def getNewGreenValue(self):
-    #     if self.isGoingUp():
-    #         if self.getGreenValue() + self.colorStep >= 255:
-    #             return 255
-    #         return self.getGreenValue() + self.colorStep
-    #     if self.getGreenValue() - self.colorStep <= 50:
-    #         return 50
-    #     if self.getRedValue() == 255:
-    #         return self.getGreenValue() - self.colorStep
-
+    
     def getGreenValue(self):
         return self.greenValue
     

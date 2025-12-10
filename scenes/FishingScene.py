@@ -2,14 +2,14 @@ import time
 import random
 
 from lib import graphics as gph
-from entities import Cursor, Fish, ProgressBar
+from entities import Sprite, Cursor, Fish, ProgressBar
 
 class FishingScene:
     def __init__(self, game):
         self.game = game
 
-        self.gui = gph.Image(gph.Point(1050, 360), self.game.assets/"gui.png")
-        self.fishing = gph.Image(gph.Point(625, 350), self.game.assets/"fishing.png")
+        self.gui = Sprite(gph.Image(gph.Point(1050, 360), self.game.assets/"gui.png"), self.game.win)
+        self.fishing = Sprite(gph.Image(gph.Point(625, 350), self.game.assets/"fishing.png"), self.game.win)
 
         self.cursor_images = {
             "easy": gph.Image(gph.Point(1060, 520), self.game.assets/"cursor-easy.png"),
@@ -33,8 +33,8 @@ class FishingScene:
         bar = gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270))
         self.progress_bar = ProgressBar(bar, self.game.win, self.fish, self.cursor)
 
-        self.gui.draw(self.game.win)
-        self.fishing.draw(self.game.win)
+        self.gui.draw()
+        self.fishing.draw()
         self.cursor.draw()
         self.fish.draw()
         self.progress_bar.draw()
