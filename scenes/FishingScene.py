@@ -26,7 +26,7 @@ class FishingScene:
         self.progress_bar = None
         self.speed = 0
 
-    def enter_scene(self):
+    def enter_scene(self, from_title=False):
         difficulty = random.choice(["easy", "medium", "hard"])
         self.cursor = Cursor(self.cursor_images[difficulty], self.game.win)
 

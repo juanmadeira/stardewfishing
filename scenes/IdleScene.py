@@ -17,12 +17,15 @@ class IdleScene:
         self.detect_fish = 0
         self.hitted = False
 
-    def enter_scene(self):
-        radio.play(self.game.assets/"audios"/"sfx"/"reel.wav")
-        radio.play(self.game.assets/"audios"/"sfx"/"pull-water.wav")
+    def enter_scene(self, from_title=False):
+        if from_title:
+            radio.play(self.game.assets/"audios"/"sfx"/"enter.wav")
+            radio.play(self.game.assets/"audios"/"sfx"/"reel.wav")
+            radio.play(self.game.assets/"audios"/"sfx"/"pull-water.wav")
+            self.play_random_music()
+
         self.idle.draw()
         self.detect_fish = time.time() + random.uniform(2, 5)
-        self.play_random_music()
 
     def play_random_music(self):
         playlist = [

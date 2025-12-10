@@ -10,7 +10,7 @@ class TitleScene:
         self.title = Sprite(gph.Image(gph.Point(640, 200), self.game.assets/"title.png"), self.game.win)
         self.start = Sprite(gph.Image(gph.Point(640, 600), self.game.assets/"start.png"), self.game.win)
 
-    def enter_scene(self):
+    def enter_scene(self, from_title=False):
         radio.stop_all()
         radio.play(self.game.assets/"audios"/"title-screen.wav")
         self.title.draw()
@@ -23,4 +23,4 @@ class TitleScene:
 
     def update(self, key):
         if key in ("RETURN", "KP_ENTER"):
-            self.game.change_scene("idle")
+            self.game.change_scene("idle", True)

@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 from PIL import Image as PILImage, ImageTk
 
@@ -30,10 +31,10 @@ class Game:
         self.bg = self.win.create_image(0, 0, anchor="nw", image=self.frames[0])
         self.state = {"i": 0}
 
-    def change_scene(self, scene):
+    def change_scene(self, scene, from_title=False):
         self.current_scene.exit_scene()
         self.current_scene = self.scenes[scene]
-        self.current_scene.enter_scene()
+        self.current_scene.enter_scene(from_title)
 
     def _background_frames(self):
         from PIL import Image as PILImage, ImageTk
@@ -59,6 +60,8 @@ class Game:
         key = self.win.checkKey().upper()
 
         if key in ("ESCAPE", "Q"):
+            radio.play(self.assets/"audios"/"sfx"/"exit.wav")
+            time.sleep(0.5)
             if self.current_scene == self.scenes["title"]:
                 self.close_game()
             elif self.current_scene == self.scenes["idle"]:
