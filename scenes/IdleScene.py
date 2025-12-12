@@ -52,8 +52,6 @@ class IdleScene:
             self.fish_detected = True
             
         if getattr(self, "fish_detected"):
-            print(time.time(), self.reaction_time)
-
             if key in ("SPACE", "UP"):
                 self.hitted = True
                 self.hit_time = time.time()

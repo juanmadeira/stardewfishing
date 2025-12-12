@@ -27,9 +27,11 @@ class Game:
 
         self.current_scene = self.scenes["title"]
 
+        self.state = {"i": 0}
         self.frames = self._background_frames()
         self.bg = self.win.create_image(0, 0, anchor="nw", image=self.frames[0])
-        self.state = {"i": 0}
+
+        self.win.master.protocol("WM_DELETE_WINDOW", self.close_game)
 
     def change_scene(self, scene, from_title=False):
         self.current_scene.exit_scene()
@@ -46,22 +48,16 @@ class Game:
             frames.append(ImageTk.PhotoImage(frame))
         return frames
 
-    def _background_loop(self):
-        if not self.win.isOpen():
-            return
+    def _background_loop(self):        
         self.win.itemconfig(self.bg, image=self.frames[self.state["i"]])
         self.state["i"] = (self.state["i"] + 1) % len(self.frames)
         self.win.master.after(120, self._background_loop)
 
-    def _loop(self):
-        if not self.win.isOpen():
-            return
-
+    def _loop(self):        
         key = self.win.checkKey().upper()
-
         if key in ("ESCAPE", "Q"):
             radio.play(self.assets/"audios"/"sfx"/"exit.wav")
-            time.sleep(0.5)
+            time.sleep(0.25)
             if self.current_scene == self.scenes["title"]:
                 self.close_game()
             elif self.current_scene == self.scenes["idle"]:
