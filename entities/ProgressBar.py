@@ -78,7 +78,13 @@ class ProgressBar(Entity):
     
     def getStartPoint(self):
         return self.sprite.getP1()
-
+    
+    def isFishCaught(self):
+        return self.getNewY() == self.getUpperLimit()
+    
+    def isFishEscaped(self):
+        return self.getNewY() == self.getLowerLimit()
+        
     def getNewRedAndGreenValue(self):
         red = self.getRedValue()
         green = self.getGreenValue()

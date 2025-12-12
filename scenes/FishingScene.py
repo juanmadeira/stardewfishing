@@ -2,6 +2,7 @@ import time
 import random
 
 from lib import graphics as gph
+from lib import radio
 from entities import Sprite, Cursor, Fish, ProgressBar
 
 class FishingScene:
@@ -59,6 +60,13 @@ class FishingScene:
             self.speed = 0
         if self.cursor.isAtLowerLimit() and self.speed < 0:
             self.speed = 0
+
+        if self.progress_bar.isFishCaught():
+            radio.play(self.game.assets/"audios"/"sfx"/"fish-caught.wav")
+            return self.game.change_scene("idle")
+        elif self.progress_bar.isFishEscaped():
+            radio.play(self.game.assets/"audios"/"sfx"/"fish-escape.wav")
+            return self.game.change_scene("idle")
 
         self.progress_bar.growProgressBar()
         self.fish.horizontalFlick()
