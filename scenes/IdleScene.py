@@ -14,14 +14,7 @@ class IdleScene:
         self.exclamation = Sprite(gph.Image(gph.Point(515, 295), self.game.assets/"exclamation.png"), self.game.win)
         self.hit = Sprite(gph.Image(gph.Point(645, 265), self.game.assets/"hit.png"), self.game.win)
 
-    def enter_scene(self, from_title=False):
-        if from_title:
-            radio.play(self.game.assets/"audios"/"sfx"/"enter.wav")
-            radio.play(self.game.assets/"audios"/"sfx"/"reel.wav")
-            radio.play(self.game.assets/"audios"/"sfx"/"pull-water.wav")
-            self.play_random_music()
-
-        self.idle.draw()
+    def set_fish_wait(self):
         self.hitted = False
         self.fish_detected = False
         self.detect_time = time.time() + random.uniform(2, 5)
@@ -35,6 +28,16 @@ class IdleScene:
         random.shuffle(playlist)
         radio.play(playlist[0])
 
+    def enter_scene(self, from_title=False):
+        if from_title:
+            radio.play(self.game.assets/"audios"/"sfx"/"enter.wav")
+            radio.play(self.game.assets/"audios"/"sfx"/"reel.wav")
+            radio.play(self.game.assets/"audios"/"sfx"/"pull-water.wav")
+            self.play_random_music()
+
+        self.idle.draw()
+        self.set_fish_wait()
+
     def exit_scene(self):
         self.idle.undraw()
         self.exclamation.undraw()
@@ -44,18 +47,22 @@ class IdleScene:
         if time.time() >= self.detect_time and not getattr(self, "fish_detected"):
             radio.play(self.game.assets/"audios"/"sfx"/"fish-bite.wav")
             self.exclamation.draw()
-            self.fish_detected = True
-
-        if getattr(self, "fish_detected"):
             self.reaction_time = time.time() + 3
+            self.punition_time = self.reaction_time + 10
+            self.fish_detected = True
             
+        if getattr(self, "fish_detected"):
+            print(time.time(), self.reaction_time)
+
             if key in ("SPACE", "UP"):
                 self.hitted = True
                 self.hit_time = time.time()
                 self.exclamation.undraw()
-            if time.time() >= time.time() + self.reaction_time:
+
+            if time.time() >= self.reaction_time:
                 self.exclamation.undraw()
-                return self.game.change_scene("idle")
+                if time.time() >= self.punition_time:
+                    return self.game.change_scene("idle")
 
         if getattr(self, "hitted"):
             if not self.hit.is_drawn():
