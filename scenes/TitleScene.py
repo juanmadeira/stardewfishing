@@ -5,7 +5,6 @@ from entities import Sprite
 class TitleScene:
     def __init__(self, game):
         self.game = game
-
         self.title = Sprite(gph.Image(gph.Point(640, 200), self.game.assets/"title.png"), self.game.win)
         self.start = Sprite(gph.Image(gph.Point(640, 600), self.game.assets/"start.png"), self.game.win)
 

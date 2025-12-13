@@ -7,7 +7,6 @@ from entities import Sprite
 class IdleScene:
     def __init__(self, game):
         self.game = game
-
         self.idle = Sprite(gph.Image(gph.Point(625, 350), self.game.assets/"idle.png"), self.game.win)
         self.exclamation = Sprite(gph.Image(gph.Point(515, 295), self.game.assets/"exclamation.png"), self.game.win)
         self.hit = Sprite(gph.Image(gph.Point(645, 265), self.game.assets/"hit.png"), self.game.win)
