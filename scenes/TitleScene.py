@@ -1,6 +1,5 @@
 from lib import graphics as gph
 from lib import radio
-
 from entities import Sprite
 
 class TitleScene:

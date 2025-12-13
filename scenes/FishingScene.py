@@ -1,6 +1,4 @@
 import time
-import random
-
 from lib import graphics as gph
 from lib import radio
 from entities import Sprite, Cursor, Fish, ProgressBar
@@ -11,28 +9,17 @@ class FishingScene:
 
         self.gui = Sprite(gph.Image(gph.Point(1050, 360), self.game.assets/"gui.png"), self.game.win)
         self.fishing = Sprite(gph.Image(gph.Point(625, 350), self.game.assets/"fishing.png"), self.game.win)
-
-        self.cursor_images = {
-            "easy": gph.Image(gph.Point(1060, 520), self.game.assets/"cursor-easy.png"),
-            "medium": gph.Image(gph.Point(1060, 583), self.game.assets/"cursor-medium.png"),
-            "hard": gph.Image(gph.Point(1060, 619), self.game.assets/"cursor-hard.png"),
-        }
-
-        # TODO - select fishes with glob and randomize fish spawn
-
-        fish_sprite = gph.Image(gph.Point(1060, 400), self.game.assets/"fish.png")
-        self.fish = Fish(fish_sprite, game.win)
-
-        self.cursor = None
-        self.progress_bar = None
-        self.speed = 0
+        self.fish = Fish(gph.Image(gph.Point(1060, 400), self.game.assets/"fish.png"), self.game.win)
+        self.bar = gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270))
 
     def enter_scene(self, from_title=False):
-        difficulty = random.choice(["easy", "medium", "hard"])
-        self.cursor = Cursor(self.cursor_images[difficulty], self.game.win)
+        difficulty = self.fish.getDifficulty()
+        rarity = self.fish.getRarity(difficulty)
 
-        bar = gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270))
-        self.progress_bar = ProgressBar(bar, self.game.win, self.fish, self.cursor)
+        print(f"difficulty: {difficulty} | rarity: {rarity}")
+
+        self.cursor = Cursor(difficulty, self.game.win, self.game)
+        self.progress_bar = ProgressBar(self.bar, self.game.win, self.fish, self.cursor)
 
         self.gui.draw()
         self.fishing.draw()
