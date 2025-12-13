@@ -4,12 +4,27 @@
     <img src="../assets/title.png" alt="Logo de Stardew Fishing">
 </p>
 
-## Descrição do Jogo
+[![Build status](https://github.com/juanmadeira/stardewfishing/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/juanmadeira/stardewfishing/actions/workflows/build.yml)
+[![GitHub release](https://img.shields.io/github/release/juanmadeira/stardewfishing.svg)](https://github.com/juanmadeira/stardewfishing/releases/latest)
+
 Stardew Fishing é um jogo de pesca de _quick time event_ que utiliza da biblioteca [graphics](https://mcsp.wartburg.edu/zelle/python/graphics.py), onde o jogador deve capturar peixes em um ambiente inspirado no minigame de pesca de Stardew Valley, criado originalmente por Eric Barone (CorcernedApe). O objetivo principal é pescar peixes em uma barra com um cursor de pesca que se move de maneira fluida, atento à movimentação do peixe que acrescenta ao desafio.
 
-<br>
 <p align="center">
     <img src="./screenshot.png" alt="Captura de tela de Stardew Fishing">
+</p>
+
+## Download 
+| 🪟 [Windows 10+ (x64)](https://github.com/juanmadeira/stardewfishing/releases/latest/download/stardewfishing.exe) | 🐧 [Linux (x64)](https://github.com/juanmadeira/stardewfishing/releases/latest/download/stardewfishing) |
+| ------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+
+<br>
+
+<p align="center">
+    <img src="../assets/fishes/sunfish.png" width="30px">
+    <img src="../assets/fishes/herring.png" width="30px">
+    <img src="../assets/fishes/tilapia.png" width="30px">
+    <img src="../assets/fishes/sturgeon.png" width="30px">
+    <img src="../assets/fishes/salmon.png" width="30px">
 </p>
 
 ## Controles
@@ -39,26 +54,3 @@ O tamanho do cursor varia de acordo com a dificuldade do peixe. Quanto maior a d
 
 ### Pontuação e progresso
 O objetivo do jogo é capturar o maior número possível de peixes, que são convertidos em um valor determinado por sua raridade.
-
-<p align="center">
-    <img src="../assets/fishes/sunfish.png" width="30px">
-    <img src="../assets/fishes/herring.png" width="30px">
-    <img src="../assets/fishes/tilapia.png" width="30px">
-    <img src="../assets/fishes/sturgeon.png" width="30px">
-    <img src="../assets/fishes/salmon.png" width="30px">
-</p>
-
-## Dependências
-```shell
-python python-tk ffmpeg
-```
-
-## Como instalar
-```shell
-git clone https://github.com/juanmadeira/stardewfishing
-cd stardewfishing
-python -m venv .venv
-source .venv/bin/active
-pip install -r requirements.txt
-python stardewfishing.py
-```
