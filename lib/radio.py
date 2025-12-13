@@ -2,22 +2,23 @@ import platform
 import os
 import threading
 import subprocess
+import shutil
 
 _STOP_FLAG = False
 _current_proc = None
 _lock = threading.Lock()
 
-has_ffmpeg = subprocess.run(["which", "ffmpeg"], capture_output=True, text=True)
 
 def _play_one_file_blocking(filename):
-    global _STOP_FLAG, _current_proc
+    global _current_proc
 
     system = platform.system()
+
     if system == "Windows":
         import winsound
         try:
             winsound.PlaySound(filename, winsound.SND_FILENAME)
-        except:
+        except Exception:
             pass
         return
 
@@ -31,7 +32,9 @@ def _play_one_file_blocking(filename):
         return
 
     elif system == "Linux":
-        if has_ffmpeg.returncode == 0:
+        has_ffmpeg = shutil.which("ffmpeg") is not None
+
+        if has_ffmpeg:
             _current_proc = subprocess.Popen(
                 ["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", filename],
                 stdout=subprocess.DEVNULL,
@@ -43,23 +46,28 @@ def _play_one_file_blocking(filename):
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
+
         _current_proc.wait()
         return
 
+
 def play(filename):
-    t = threading.Thread(target=_play_one_file_blocking, args=(filename,))
-    t.daemon = True
+    t = threading.Thread(
+        target=_play_one_file_blocking,
+        args=(filename,),
+        daemon=True
+    )
     t.start()
 
+
 def stop_all():
-    global _STOP_FLAG, _current_proc
-    _STOP_FLAG = True
+    global _current_proc
 
     with _lock:
         if _current_proc and _current_proc.poll() is None:
             try:
                 _current_proc.terminate()
-            except:
+            except Exception:
                 pass
         _current_proc = None
 
@@ -73,13 +81,13 @@ def stop_all():
         os.system("killall afplay 2>/dev/null")
 
     elif system == "Linux":
-        if has_ffmpeg.returncode == 0:
+        if shutil.which("ffmpeg"):
             os.system("killall ffplay 2>/dev/null")
         else:
             os.system("killall aplay 2>/dev/null")
 
+
 def is_playing():
-    global _current_proc
     if _current_proc is None:
         return False
     return _current_proc.poll() is None
