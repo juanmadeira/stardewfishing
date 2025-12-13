@@ -1,54 +1,26 @@
-import platform
-import os
 import threading
-import subprocess
-import shutil
+import simpleaudio as sa
 
-_STOP_FLAG = False
-_current_proc = None
 _lock = threading.Lock()
+_current_play = None
 
 
 def _play_one_file_blocking(filename):
-    global _current_proc
+    global _current_play
 
-    system = platform.system()
+    try:
+        wave = sa.WaveObject.from_wave_file(filename)
+        play_obj = wave.play()
 
-    if system == "Windows":
-        import winsound
-        try:
-            winsound.PlaySound(filename, winsound.SND_FILENAME)
-        except Exception:
-            pass
-        return
+        with _lock:
+            _current_play = play_obj
 
-    elif system == "Darwin":
-        _current_proc = subprocess.Popen(
-            ["afplay", filename],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
-        _current_proc.wait()
-        return
-
-    elif system == "Linux":
-        has_ffmpeg = shutil.which("ffmpeg") is not None
-
-        if has_ffmpeg:
-            _current_proc = subprocess.Popen(
-                ["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", filename],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
-        else:
-            _current_proc = subprocess.Popen(
-                ["aplay", filename],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
-
-        _current_proc.wait()
-        return
+        play_obj.wait_done()
+    except Exception:
+        pass
+    finally:
+        with _lock:
+            _current_play = None
 
 
 def play(filename):
@@ -61,33 +33,16 @@ def play(filename):
 
 
 def stop_all():
-    global _current_proc
-
+    global _current_play
     with _lock:
-        if _current_proc and _current_proc.poll() is None:
+        if _current_play:
             try:
-                _current_proc.terminate()
+                _current_play.stop()
             except Exception:
                 pass
-        _current_proc = None
-
-    system = platform.system()
-
-    if system == "Windows":
-        import winsound
-        winsound.PlaySound(None, winsound.SND_PURGE)
-
-    elif system == "Darwin":
-        os.system("killall afplay 2>/dev/null")
-
-    elif system == "Linux":
-        if shutil.which("ffmpeg"):
-            os.system("killall ffplay 2>/dev/null")
-        else:
-            os.system("killall aplay 2>/dev/null")
+            _current_play = None
 
 
 def is_playing():
-    if _current_proc is None:
-        return False
-    return _current_proc.poll() is None
+    with _lock:
+        return _current_play is not None and _current_play.is_playing()
