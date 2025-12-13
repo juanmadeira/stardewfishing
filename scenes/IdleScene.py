@@ -29,13 +29,17 @@ class IdleScene:
         radio.play(playlist[0])
 
     def enter_scene(self, from_title=False):
+        self.idle.draw()
+
         if from_title:
             radio.play(self.game.assets/"audios"/"sfx"/"enter.wav")
-            radio.play(self.game.assets/"audios"/"sfx"/"reel.wav")
+            delay = time.time() + 0.5
+            while time.time() < delay:
+                self.game.win.update()
+            self.game.win.master.after(500, radio.play(self.game.assets/"audios"/"sfx"/"reel.wav"))
             radio.play(self.game.assets/"audios"/"sfx"/"pull-water.wav")
             self.play_random_music()
 
-        self.idle.draw()
         self.set_fish_wait()
 
     def exit_scene(self):
