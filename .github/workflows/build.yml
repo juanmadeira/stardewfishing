@@ -5,6 +5,9 @@ on:
     tags:
       - "b*"
 
+permissions:
+  contents: write
+
 jobs:
   linux:
     runs-on: ubuntu-latest
@@ -24,9 +27,10 @@ jobs:
             --add-data "assets:assets" \
             stardewfishing.py
 
-      - uses: softprops/action-gh-release@v2
+      - uses: actions/upload-artifact@v4
         with:
-          files: dist/stardewfishing
+          name: linux
+          path: dist/stardewfishing
 
   windows:
     runs-on: windows-latest
@@ -47,6 +51,19 @@ jobs:
             --add-data "assets;assets" ^
             stardewfishing.py
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/stardewfishing.exe
+
+  release:
+    needs: [linux, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+
       - uses: softprops/action-gh-release@v2
         with:
-          files: dist/stardewfishing.exe
+          files: |
+            linux/stardewfishing
+            windows/stardewfishing.exe
