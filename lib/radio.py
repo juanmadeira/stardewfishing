@@ -1,48 +1,18 @@
-import threading
-import simpleaudio as sa
+import pygame
+from threading import Lock
 
-_lock = threading.Lock()
-_current_play = None
+pygame.mixer.init()
 
-
-def _play_one_file_blocking(filename):
-    global _current_play
-
-    try:
-        wave = sa.WaveObject.from_wave_file(filename)
-        play_obj = wave.play()
-
-        with _lock:
-            _current_play = play_obj
-
-        play_obj.wait_done()
-    except Exception:
-        pass
-    finally:
-        with _lock:
-            _current_play = None
-
+_lock = Lock()
 
 def play(filename):
-    t = threading.Thread(
-        target=_play_one_file_blocking,
-        args=(filename,),
-        daemon=True
-    )
-    t.start()
-
+    with _lock:
+        sound = pygame.mixer.Sound(str(filename))
+        sound.play()
 
 def stop_all():
-    global _current_play
     with _lock:
-        if _current_play:
-            try:
-                _current_play.stop()
-            except Exception:
-                pass
-            _current_play = None
-
+        pygame.mixer.stop()
 
 def is_playing():
-    with _lock:
-        return _current_play is not None and _current_play.is_playing()
+    return pygame.mixer.get_busy()
