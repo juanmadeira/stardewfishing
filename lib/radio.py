@@ -1,18 +1,22 @@
-import pygame
+import pyglet
 from threading import Lock
 
-pygame.mixer.init()
-
 _lock = Lock()
+_players = []
 
 def play(filename):
     with _lock:
-        sound = pygame.mixer.Sound(str(filename))
-        sound.play()
+        sound = pyglet.media.load(str(filename), streaming=False)
+        player = pyglet.media.Player()
+        player.queue(sound)
+        player.play()
+        _players.append(player)
 
 def stop_all():
     with _lock:
-        pygame.mixer.stop()
+        for p in _players:
+            p.pause()
+        _players.clear()
 
 def is_playing():
-    return pygame.mixer.get_busy()
+    return any(p.playing for p in _players)
