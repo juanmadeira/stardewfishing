@@ -52,7 +52,7 @@ class IdleScene:
             self.punition_time = self.reaction_time + 10
             self.fish_detected = True
             
-        if getattr(self, "fish_detected"):
+        if getattr(self, "fish_detected") and not getattr(self, "hitted"):
             if key in ("SPACE", "UP"):
                 self.hitted = True
                 self.hit_time = time.time()
