@@ -1,5 +1,5 @@
-import time
 from lib import graphics as gph
+import random as rd
 from lib import radio
 from entities import Sprite, Cursor, Fish, ProgressBar
 
@@ -7,11 +7,14 @@ class FishingScene:
     def __init__(self, game):
         self.game = game
         self.gui = Sprite(gph.Image(gph.Point(1050, 360), self.game.assets/"gui.png"), self.game.win)
-        self.fishing = Sprite(gph.Image(gph.Point(625, 350), self.game.assets/"fishing.png"), self.game.win)
-        self.fish = Fish(gph.Image(gph.Point(1060, 400), self.game.assets/"fish.png"), self.game.win)
+        self.fishing = Sprite(gph.Image(gph.Point(625, 350), self.game.assets/"fishing.png"), self.game.win) 
         self.bar = gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270))
+        self.timecounter = 0
+        self.movement = 1
+        self.timeLimitToChangeMovement= rd.randint(0,200)
         
     def enter_scene(self, from_title=False):
+        self.fish = Fish(gph.Image(gph.Point(1060, 620), self.game.assets/"fish.png"), self.game.win)
         difficulty = self.fish.getDifficulty()
         rarity = self.fish.getRarity(difficulty)
 
@@ -40,7 +43,7 @@ class FishingScene:
             self.gravity = 0.5
             self.speed += self.gravity
         else:
-            self.speed -= 0.15
+            self.speed -= 0.23
 
         if self.cursor.isAtUpperLimit() and self.speed > 0:
             self.speed = 0
@@ -56,4 +59,12 @@ class FishingScene:
 
         self.progress_bar.growProgressBar()
         self.fish.horizontalFlick()
+        print(self.timecounter)
+        self.timecounter += 1
+        self.fish.move(self.movement*6)
+        if self.timecounter > self.timeLimitToChangeMovement:
+            self.timeLimitToChangeMovement = rd.randint(0,120)
+            self.movement = self.fish.randomizeMovement()
+            print('mudei a direção em:', self.timecounter,'\nagora estou me movendo em função de',self.movement)
+            self.timecounter = 0
         self.cursor.move(self.speed)
