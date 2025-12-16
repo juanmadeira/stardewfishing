@@ -1,4 +1,4 @@
-from lib import graphics as gph
+from lib import gph
 
 class Sprite:
     def __init__(self, sprite, window: gph.GraphWin):

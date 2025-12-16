@@ -1,11 +1,10 @@
-import random
-from lib import graphics as gph
+import random as rd
+from lib import gph, ASSETS_DIR
 from entities import Entity
 
 class Fish(Entity):
-    def __init__(self, sprite: gph.Image, window: gph.GraphWin, game):
+    def __init__(self, sprite: gph.Image, window: gph.GraphWin):
         super().__init__(sprite, window)
-        self.game = game
         self.lastHorizontalFlick = 2
 
     def horizontalFlick(self):
@@ -13,10 +12,10 @@ class Fish(Entity):
         self.lastHorizontalFlick *= -1
 
     def randomizeMovement(self):
-        return random.choices([-1,0,1], [0.30, 0.1, 0.30])[0]
+        return rd.choices([-1,0,1], [0.30, 0.1, 0.30])[0]
 
     def getDifficulty(self):
-        return random.choices(
+        return rd.choices(
             ["easy", "medium", "hard"],
             weights=[0.45, 0.35, 0.2],
             k=1
@@ -24,21 +23,21 @@ class Fish(Entity):
     
     def getRarity(self, difficulty):
         if difficulty == "easy":
-            return random.choices(
+            return rd.choices(
                 ["common", "uncommon", "rare"],
                 weights=[0.7, 0.25, 0.05],
                 k=1
             )[0]
         
         if difficulty == "medium":
-            return random.choices(
+            return rd.choices(
                 ["common", "uncommon", "rare"],
                 weights=[0.35, 0.5, 0.15],
                 k=1
             )[0]
         
         if difficulty == "hard":
-            return random.choices(
+            return rd.choices(
                 ["common", "uncommon", "rare"],
                 weights=[0.05, 0.25, 0.7],
                 k=1
@@ -46,9 +45,9 @@ class Fish(Entity):
         return False
     
     def getFishSpecie(self, rarity):
-        fishes = self.game.assets/"fishes"/rarity
+        fishes = ASSETS_DIR/"fishes"/rarity
         files = list(fishes.glob("*.png"))
-        return random.choice(files).stem
+        return rd.choice(files).stem
     
     def move(self, amount):
         new_y = self.getCenterY() - amount

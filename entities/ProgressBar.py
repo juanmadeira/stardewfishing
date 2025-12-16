@@ -1,4 +1,4 @@
-from lib import graphics as gph
+from lib import gph
 from entities import Entity, Fish, Cursor
 
 class ProgressBar(Entity):
