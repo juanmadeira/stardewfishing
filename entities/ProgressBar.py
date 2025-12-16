@@ -58,6 +58,7 @@ class ProgressBar(Entity):
     def getNewY(self):
         pace = 5
         if self.isGoingUp():
+            pace = 3
             if self.getOldY() - pace <= 70:
                 return 70
             if self.getOldY() > 70:
