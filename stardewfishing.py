@@ -1,10 +1,8 @@
 import time
 from pathlib import Path
 from PIL import Image as PILImage, ImageTk
-
 from lib import radio
 from lib import graphics as gph
-
 from scenes import TitleScene, IdleScene, FishingScene, CaughtScene
 
 class Game:
