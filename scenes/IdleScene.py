@@ -25,17 +25,18 @@ class IdleScene:
         random.shuffle(playlist)
         radio.play(playlist[0])
 
-    def enter_scene(self, from_title=False):
+    def enter_scene(self):
         self.idle.draw()
 
-        if from_title:
+        if self.game.last_scene == self.game.scenes["title"]:
             radio.play(self.game.assets/"audios"/"sfx"/"enter.wav")
+            self.play_random_music()
+        if self.game.last_scene == self.game.scenes["title"] or self.game.last_scene == self.game.scenes["caught"]:
             delay = time.time() + 0.5
             while time.time() < delay:
                 self.game.win.update()
             self.game.win.master.after(500, radio.play(self.game.assets/"audios"/"sfx"/"reel.wav"))
             radio.play(self.game.assets/"audios"/"sfx"/"pull-water.wav")
-            self.play_random_music()
 
         self.set_fish_wait()
 
