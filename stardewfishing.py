@@ -1,28 +1,22 @@
 import time
-from pathlib import Path
 from PIL import Image as PILImage, ImageTk
-from lib import radio, graphics as gph
+from lib import gph, radio, ASSETS_DIR, AUDIOS_DIR
 from scenes import TitleScene, IdleScene, FishingScene, CaughtScene
 
 class Game:
     def __init__(self):
         self.win = gph.GraphWin("Stardew Fishing", 1280, 720, autoflush=False)
-        self.basedir = Path(__file__).resolve().parent
-        self.assets = self.basedir/"assets"
-
         self.scenes = {
             "title": TitleScene(self),
             "idle": IdleScene(self),
             "fishing": FishingScene(self),
             "caught": CaughtScene(self)
         }
-
         self.current_scene = self.scenes["title"]
 
         self.state = {"i": 0}
         self.frames = self._background_frames()
         self.bg = self.win.create_image(0, 0, anchor="nw", image=self.frames[0])
-
         self.win.master.protocol("WM_DELETE_WINDOW", self.close_game)
 
     def change_scene(self, scene):
@@ -32,7 +26,7 @@ class Game:
         self.current_scene.enter_scene()
 
     def _background_frames(self):
-        gif = PILImage.open(self.basedir/"assets"/"background.gif")
+        gif = PILImage.open(ASSETS_DIR/"background.gif")
         frames = []
         for i in range(gif.n_frames):
             gif.seek(i)
@@ -48,14 +42,14 @@ class Game:
     def _loop(self):        
         key = self.win.checkKey().upper()
         if key in ("ESCAPE", "Q"):
-            radio.play(self.assets/"audios"/"sfx"/"exit.wav")
+            radio.play(AUDIOS_DIR/"sfx"/"exit.wav")
             time.sleep(0.25)
             if self.current_scene == self.scenes["title"]:
                 self.close_game()
             elif self.current_scene == self.scenes["idle"]:
                 self.change_scene("title")
             elif self.current_scene == self.scenes["fishing"]:
-                radio.play(self.assets/"audios"/"sfx"/"fish-escape.wav")
+                radio.play(AUDIOS_DIR/"sfx"/"fish-escape.wav")
                 self.change_scene("idle")
             elif self.current_scene == self.scenes["caught"]:
                 self.change_scene("idle")

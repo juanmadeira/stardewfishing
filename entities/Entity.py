@@ -1,10 +1,9 @@
-from lib import graphics as gph
+from lib import gph
 from entities import Sprite
 
 class Entity(Sprite):
     def __init__(self, sprite, window: gph.GraphWin):
         super().__init__(sprite, window)
-        
         if hasattr(sprite, "getHeight"):
             self.height = sprite.getHeight()
 

@@ -1,19 +1,18 @@
-from lib import graphics as gph
+from lib import gph, ASSETS_DIR
 from entities import Entity
 
 class Cursor(Entity):
-    def __init__(self, difficulty, window: gph.GraphWin, game):
-        self.game = game
+    def __init__(self, difficulty, window: gph.GraphWin):
         sprite = self.getSprites(difficulty)
         super().__init__(sprite, window)
 
     def getSprites(self, difficulty):
         if difficulty == "easy":
-            return gph.Image(gph.Point(1060, 520), self.game.assets/"cursor-easy.png")
+            return gph.Image(gph.Point(1060, 520), ASSETS_DIR/"cursor-easy.png")
         if difficulty == "medium":
-            return gph.Image(gph.Point(1060, 583), self.game.assets/"cursor-medium.png")
+            return gph.Image(gph.Point(1060, 583), ASSETS_DIR/"cursor-medium.png")
         if difficulty == "hard":
-            return gph.Image(gph.Point(1060, 619), self.game.assets/"cursor-hard.png")
+            return gph.Image(gph.Point(1060, 619), ASSETS_DIR/"cursor-hard.png")
         return False
 
     def move(self, amount):
