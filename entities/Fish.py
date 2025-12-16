@@ -3,8 +3,9 @@ from lib import graphics as gph
 from entities import Entity
 
 class Fish(Entity):
-    def __init__(self, sprite: gph.Image, window: gph.GraphWin):
+    def __init__(self, sprite: gph.Image, window: gph.GraphWin, game):
         super().__init__(sprite, window)
+        self.game = game
         self.lastHorizontalFlick = 2
 
     def horizontalFlick(self):
@@ -17,7 +18,7 @@ class Fish(Entity):
     def getDifficulty(self):
         return random.choices(
             ["easy", "medium", "hard"],
-            weights=[0.5, 0.3, 0.2],
+            weights=[0.45, 0.35, 0.2],
             k=1
         )[0]
     
@@ -39,11 +40,15 @@ class Fish(Entity):
         if difficulty == "hard":
             return random.choices(
                 ["common", "uncommon", "rare"],
-                weights=[0.2, 0.5, 0.3],
+                weights=[0.05, 0.25, 0.7],
                 k=1
             )[0]
-        
         return False
+    
+    def getFishSpecie(self, rarity):
+        fishes = self.game.assets/"fishes"/rarity
+        files = list(fishes.glob("*.png"))
+        return random.choice(files).stem
     
     def move(self, amount):
         new_y = self.getCenterY() - amount

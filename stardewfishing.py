@@ -2,14 +2,7 @@ import time
 from pathlib import Path
 from PIL import Image as PILImage, ImageTk
 from lib import radio, graphics as gph
-
-from scenes import TitleScene, IdleScene, FishingScene
-
-# def resize(path, filename, format, width, height):
-#     image = PILImage.open(path)
-#     image = image.resize((width, height))
-#     image.save(f'{basedir}/"assets"/"{filename}-resized.{format}"')
-#     return image
+from scenes import TitleScene, IdleScene, FishingScene, CaughtScene
 
 class Game:
     def __init__(self):
@@ -21,6 +14,7 @@ class Game:
             "title": TitleScene(self),
             "idle": IdleScene(self),
             "fishing": FishingScene(self),
+            "caught": CaughtScene(self)
         }
 
         self.current_scene = self.scenes["title"]
@@ -31,13 +25,13 @@ class Game:
 
         self.win.master.protocol("WM_DELETE_WINDOW", self.close_game)
 
-    def change_scene(self, scene, from_title=False):
+    def change_scene(self, scene):
         self.current_scene.exit_scene()
+        self.last_scene = self.current_scene
         self.current_scene = self.scenes[scene]
-        self.current_scene.enter_scene(from_title)
+        self.current_scene.enter_scene()
 
     def _background_frames(self):
-        from PIL import Image as PILImage, ImageTk
         gif = PILImage.open(self.basedir/"assets"/"background.gif")
         frames = []
         for i in range(gif.n_frames):
@@ -62,6 +56,8 @@ class Game:
                 self.change_scene("title")
             elif self.current_scene == self.scenes["fishing"]:
                 radio.play(self.assets/"audios"/"sfx"/"fish-escape.wav")
+                self.change_scene("idle")
+            elif self.current_scene == self.scenes["caught"]:
                 self.change_scene("idle")
 
         self.current_scene.update(key)
