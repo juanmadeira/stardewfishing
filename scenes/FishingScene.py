@@ -1,4 +1,3 @@
-import time
 from lib import graphics as gph
 from lib import radio
 from entities import Sprite, Cursor, Fish, ProgressBar
@@ -8,16 +7,14 @@ class FishingScene:
         self.game = game
         self.gui = Sprite(gph.Image(gph.Point(1050, 360), self.game.assets/"gui.png"), self.game.win)
         self.fishing = Sprite(gph.Image(gph.Point(625, 350), self.game.assets/"fishing.png"), self.game.win)
-        self.fish = Fish(gph.Image(gph.Point(1060, 400), self.game.assets/"fish.png"), self.game.win)
         self.bar = gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270))
         
-    def enter_scene(self, from_title=False):
-        difficulty = self.fish.getDifficulty()
-        rarity = self.fish.getRarity(difficulty)
-
-        self.cursor = Cursor(difficulty, self.game.win, self.game)
+    def enter_scene(self):
+        self.fish = Fish(gph.Image(gph.Point(1060, 400), self.game.assets/"fish.png"), self.game.win, self.game)
+        self.difficulty = self.fish.getDifficulty()
+        self.rarity = self.fish.getRarity(self.difficulty)
+        self.cursor = Cursor(self.difficulty, self.game.win, self.game)
         self.progress_bar = ProgressBar(self.bar, self.game.win, self.fish, self.cursor)
-        print(f"difficulty: {difficulty}\nrarity: {rarity}\n")
 
         self.speed = 0
         self.gui.draw()
@@ -49,7 +46,7 @@ class FishingScene:
 
         if self.progress_bar.isFishCaught():
             radio.play(self.game.assets/"audios"/"sfx"/"fish-caught.wav")
-            return self.game.change_scene("idle")
+            return self.game.change_scene("caught")
         elif self.progress_bar.isFishEscaped():
             radio.play(self.game.assets/"audios"/"sfx"/"fish-escape.wav")
             return self.game.change_scene("idle")
