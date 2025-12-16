@@ -1,7 +1,7 @@
 # Stardew Fishing
 
 <p align="center">
-    <img src="../assets/title.png" alt="Logo de Stardew Fishing">
+    <img src="../assets/title.png" alt="Logo de Stardew Fishing" width="475px">
 </p>
 
 [![Build status](https://github.com/juanmadeira/stardewfishing/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/juanmadeira/stardewfishing/actions/workflows/build.yml)
@@ -10,7 +10,7 @@
 Stardew Fishing é um jogo de pesca de _quick time event_ que utiliza da biblioteca [graphics](https://mcsp.wartburg.edu/zelle/python/graphics.py), onde o jogador deve capturar peixes em um ambiente inspirado no minigame de pesca de Stardew Valley, criado originalmente por Eric Barone (CorcernedApe). O objetivo principal é pescar peixes em uma barra com um cursor de pesca que se move de maneira fluida, atento à movimentação do peixe que acrescenta ao desafio.
 
 <p align="center">
-    <img src="./screenshot.png" alt="Captura de tela de Stardew Fishing">
+    <img src="./screenshot.png" alt="Captura de tela de Stardew Fishing" width="550px">
 </p>
 
 ## Download 
@@ -20,11 +20,11 @@ Stardew Fishing é um jogo de pesca de _quick time event_ que utiliza da bibliot
 <br>
 
 <p align="center">
-    <img src="../assets/fishes/sunfish.png" width="30px">
-    <img src="../assets/fishes/herring.png" width="30px">
-    <img src="../assets/fishes/tilapia.png" width="30px">
-    <img src="../assets/fishes/sturgeon.png" width="30px">
-    <img src="../assets/fishes/salmon.png" width="30px">
+    <img src="../assets/fishes/common/anchovy.png" width="30px">
+    <img src="../assets/fishes/common/carp.png" width="30px">
+    <img src="../assets/fishes/common/herring.png" width="30px">
+    <img src="../assets/fishes/common/sardine.png" width="30px">
+    <img src="../assets/fishes/common/sunfish.png" width="30px">
 </p>
 
 ## Controles
@@ -38,11 +38,11 @@ O cursor de pesca se comporta de forma fluida, movendo-se de acordo com a gravid
 A barra de progresso é um indicador de quão próximo o jogador está de fisgar o peixe. Quanto mais tempo o cursor ficar em contato com o peixe, mais a barra vai se enchendo. Se o cursor perder o contato com o peixe, a barra de progresso começa a diminuir gradativamente. Se a barra chegar a zero, o peixe escapa e o jogador perde a captura.
 
 <p align="center">
-    <img src="../assets/fishes/anchovy.png" width="30px">
-    <img src="../assets/fishes/carp.png" width="30px">
-    <img src="../assets/fishes/catfish.png" width="30px">
-    <img src="../assets/fishes/herring.png" width="30px">
-    <img src="../assets/fishes/rainbow-trout.png" width="30px">
+    <img src="../assets/fishes/uncommon/catfish.png" width="30px">
+    <img src="../assets/fishes/uncommon/rainbow-trout.png" width="30px">
+    <img src="../assets/fishes/uncommon/salmon.png" width="30px">
+    <img src="../assets/fishes/uncommon/shad.png" width="30px">
+    <img src="../assets/fishes/uncommon/sturgeon.png" width="30px">
 </p>
 
 ## Dificuldade
