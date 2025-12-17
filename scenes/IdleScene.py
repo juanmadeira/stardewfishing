@@ -37,6 +37,7 @@ class IdleScene:
             self.game.win.master.after(500, radio.play(AUDIOS_DIR/"sfx"/"reel.wav"))
             radio.play(AUDIOS_DIR/"sfx"/"pull-water.wav")
 
+        self.in_punition = False
         self.set_fish_wait()
 
     def exit_scene(self):
@@ -45,14 +46,14 @@ class IdleScene:
         self.hit.undraw()
 
     def update(self, key):
-        if time.time() >= self.detect_time and not getattr(self, "fish_detected"):
+        if time.time() >= self.detect_time and not getattr(self, "fish_detected") and not getattr(self, "in_punition"):
             radio.play(AUDIOS_DIR/"sfx"/"fish-bite.wav")
             self.exclamation.draw()
             self.reaction_time = time.time() + 3
             self.punition_time = self.reaction_time + 10
             self.fish_detected = True
             
-        if getattr(self, "fish_detected") and not getattr(self, "hitted"):
+        if getattr(self, "fish_detected") and not getattr(self, "hitted") and not getattr(self, "in_punition"):
             if key in ("SPACE", "UP"):
                 self.hitted = True
                 self.hit_time = time.time()
@@ -60,8 +61,12 @@ class IdleScene:
 
             if time.time() >= self.reaction_time:
                 self.exclamation.undraw()
-                if time.time() >= self.punition_time:
-                    return self.game.change_scene("idle")
+                self.in_punition = True
+
+        if getattr(self, "in_punition"):
+            self.fish_detected = False
+            if time.time() >= self.punition_time:
+                return self.game.change_scene("idle")
 
         if getattr(self, "hitted"):
             if not self.hit.is_drawn():
