@@ -10,7 +10,8 @@ class FishingScene:
         self.bar = gph.Rectangle(gph.Point(1103, 640), gph.Point(1115, 270))
         self.timecounter = 0
         self.movement = 1
-        self.timeLimitToChangeMovement= rd.randint(0,200)
+        self.cursor_already_moved = False
+        self.cursor_bounces_counter = 0
         
     def enter_scene(self):
         self.fish = Fish(gph.Image(gph.Point(1060, 620), ASSETS_DIR/"fish.png"), self.game.win)
@@ -18,6 +19,7 @@ class FishingScene:
         self.rarity = self.fish.getRarity(self.difficulty)
         self.cursor = Cursor(self.difficulty, self.game.win)
         self.progress_bar = ProgressBar(self.bar, self.game.win, self.fish, self.cursor)
+        self.timeLimitToChangeMovement = self.getTimeLimitToChangeMovement()
 
         self.speed = 0
         self.gui.draw()
@@ -33,22 +35,46 @@ class FishingScene:
         self.fish.undraw()
         self.progress_bar.undraw()
 
+    def getTimeLimitToChangeMovement(self):
+        if self.difficulty == "easy":
+            return rd.randint(0,200)
+        if self.difficulty == "medium":
+            return rd.randint(0,100)
+        if self.difficulty == "hard":
+            return rd.randint(0,70)
+        
+        return False
+    
     def update(self, key):
-        self.gravity = 0.3
+        self.gravity = 0.5
 
         if key in ("SPACE", "UP"):
-            self.gravity = 0.5
-            self.speed += self.gravity
-        else:
+            if self.speed < 0:
+                self.speed += self.gravity*1.6
+            else:
+                self.speed += self.gravity
+            self.cursor.cursorHasMoved()
+        elif self.cursor.hasCursorMoved():
             self.speed -= 0.23
 
         if self.cursor.isAtUpperLimit() and self.speed > 0:
             self.speed = 0
         if self.cursor.isAtLowerLimit() and self.speed < 0:
-            self.speed = 0
+            self.cursor_bounces_counter += 1
+            
+            if abs(self.speed) > 5:
+                self.speed = 3
+            self.speed = abs(self.speed)
+            if self.cursor_bounces_counter > 0:
+                self.speed -= 0.8*self.cursor_bounces_counter
+            if self.cursor_bounces_counter > 4:
+                self.cursor_bounces_counter = 0
+                self.cursor.cursorHasStopped()
+                self.speed = 0
 
         if self.progress_bar.isFishCaught():
             radio.play(AUDIOS_DIR/"sfx"/"fish-caught.wav")
+            self.game.count_fish()
             return self.game.change_scene("caught")
         elif self.progress_bar.isFishEscaped():
             radio.play(AUDIOS_DIR/"sfx"/"fish-escape.wav")
@@ -56,12 +82,13 @@ class FishingScene:
 
         self.progress_bar.growProgressBar()
         self.fish.horizontalFlick()
-        print(self.timecounter)
+
         self.timecounter += 1
-        self.fish.move(self.movement*6)
+        self.fish.move(self.movement*5)
+
         if self.timecounter > self.timeLimitToChangeMovement:
-            self.timeLimitToChangeMovement = rd.randint(0,120)
-            self.movement = self.fish.randomizeMovement()
-            print('mudei a direção em:', self.timecounter,'\nagora estou me movendo em função de',self.movement)
+            self.timeLimitToChangeMovement = self.getTimeLimitToChangeMovement()
+            self.movement = self.fish.randomizeMovement(self.difficulty)
             self.timecounter = 0
+    
         self.cursor.move(self.speed)

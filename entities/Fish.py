@@ -11,8 +11,14 @@ class Fish(Entity):
         self.sprite.move(self.lastHorizontalFlick, 0)
         self.lastHorizontalFlick *= -1
 
-    def randomizeMovement(self):
-        return rd.choices([-1,0,1], [0.30, 0.1, 0.30])[0]
+    def randomizeMovement(self, difficulty):
+        if difficulty == "easy":
+            return rd.choices([1,0,-1], [0.20, 0.60, 0.20])[0]
+        if difficulty == "medium":
+            return rd.choices([1,0,-1], [0.30, 0.40, 0.30])[0]
+        if difficulty == "hard":
+            return rd.choices([1,0,-1], [0.8, 0.1, 0.8])[0]
+        return False
 
     def getDifficulty(self):
         return rd.choices(
@@ -32,14 +38,14 @@ class Fish(Entity):
         if difficulty == "medium":
             return rd.choices(
                 ["common", "uncommon", "rare"],
-                weights=[0.4, 0.5, 0.1],
+                weights=[0.3, 0.6, 0.1],
                 k=1
             )[0]
         
         if difficulty == "hard":
             return rd.choices(
-                ["common", "uncommon", "rare"],
-                weights=[0.05, 0.2, 0.75],
+                ["uncommon", "rare"],
+                weights=[0.20, 0.80],
                 k=1
             )[0]
         return False
