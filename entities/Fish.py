@@ -22,31 +22,23 @@ class Fish(Entity):
 
     def getDifficulty(self):
         return rd.choices(
-            ["easy", "medium", "hard"],
-            weights=[0.45, 0.35, 0.2],
-            k=1
+            ["easy", "medium", "hard"], [0.45, 0.35, 0.2]
         )[0]
     
     def getRarity(self, difficulty):
         if difficulty == "easy":
             return rd.choices(
-                ["common", "uncommon", "rare"],
-                weights=[0.74, 0.25, 0.01],
-                k=1
+                ["common", "uncommon", "rare"], [0.74, 0.25, 0.01]
             )[0]
         
         if difficulty == "medium":
             return rd.choices(
-                ["common", "uncommon", "rare"],
-                weights=[0.3, 0.6, 0.1],
-                k=1
+                ["common", "uncommon", "rare"], [0.3, 0.6, 0.1]
             )[0]
         
         if difficulty == "hard":
             return rd.choices(
-                ["uncommon", "rare"],
-                weights=[0.20, 0.80],
-                k=1
+                ["uncommon", "rare"], [0.20, 0.80]
             )[0]
         return False
         
