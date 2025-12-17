@@ -5,6 +5,7 @@ class Cursor(Entity):
     def __init__(self, difficulty, window: gph.GraphWin):
         sprite = self.getSprites(difficulty)
         super().__init__(sprite, window)
+        self.already_moved = False
 
     def getSprites(self, difficulty):
         if difficulty == "easy":
@@ -43,3 +44,12 @@ class Cursor(Entity):
     
     def getUpperLimit(self):
         return 74 + self.height/2
+    
+    def cursorHasMoved(self):
+        self.already_moved = True
+    
+    def hasCursorMoved(self):
+        return self.already_moved
+    
+    def cursorHasStopped(self):
+        self.already_moved = False
