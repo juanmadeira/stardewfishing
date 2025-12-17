@@ -25,24 +25,31 @@ class Fish(Entity):
         if difficulty == "easy":
             return rd.choices(
                 ["common", "uncommon", "rare"],
-                weights=[0.7, 0.25, 0.05],
+                weights=[0.74, 0.25, 0.01],
                 k=1
             )[0]
         
         if difficulty == "medium":
             return rd.choices(
                 ["common", "uncommon", "rare"],
-                weights=[0.35, 0.5, 0.15],
+                weights=[0.4, 0.5, 0.1],
                 k=1
             )[0]
         
         if difficulty == "hard":
             return rd.choices(
                 ["common", "uncommon", "rare"],
-                weights=[0.05, 0.25, 0.7],
+                weights=[0.05, 0.2, 0.75],
                 k=1
             )[0]
         return False
+        
+    def getRarityColor(self, rarity):
+        return {
+            "common": "green",
+            "uncommon": "orange",
+            "rare": "red",
+        }[rarity]
     
     def getFishSpecie(self, rarity):
         fishes = ASSETS_DIR/"fishes"/rarity
