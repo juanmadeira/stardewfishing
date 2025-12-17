@@ -48,3 +48,5 @@ class CaughtScene:
         if time.time() > self.caught_time + 2.5:
             if key in ("SPACE", "UP"):
                 return self.game.change_scene("idle")
+        if time.time() > self.caught_time + 10:
+            return self.game.change_scene("idle")
