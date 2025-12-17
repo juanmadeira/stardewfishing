@@ -13,7 +13,7 @@ class FishingScene:
         self.timeLimitToChangeMovement= rd.randint(0,200)
         
     def enter_scene(self):
-        self.fish = Fish(gph.Image(gph.Point(1060, 400), ASSETS_DIR/"fish.png"), self.game.win)
+        self.fish = Fish(gph.Image(gph.Point(1060, 620), ASSETS_DIR/"fish.png"), self.game.win)
         self.difficulty = self.fish.getDifficulty()
         self.rarity = self.fish.getRarity(self.difficulty)
         self.cursor = Cursor(self.difficulty, self.game.win)
