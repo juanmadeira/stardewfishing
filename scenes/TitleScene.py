@@ -12,6 +12,10 @@ class TitleScene:
         radio.play(AUDIOS_DIR/"title-screen.wav")
         self.title.draw()
         self.start.draw()
+        if self.game.score.canvas is not None:
+            self.game.score.undraw()
+            self.game.num_score.undraw()
+
 
     def exit_scene(self):
         radio.stop_all()

@@ -17,6 +17,9 @@ class Game:
         self.state = {"i": 0}
         self.frames = self._background_frames()
         self.bg = self.win.create_image(0, 0, anchor="nw", image=self.frames[0])
+        self.fish_count = 0
+        self.score = gph.Text(gph.Point(200, 20), 'Peixes capturados: ')
+        self.num_score = gph.Text(gph.Point(350, 22), str(self.fish_count))
         self.win.master.protocol("WM_DELETE_WINDOW", self.close_game)
 
     def change_scene(self, scene):
@@ -24,6 +27,29 @@ class Game:
         self.last_scene = self.current_scene
         self.current_scene = self.scenes[scene]
         self.current_scene.enter_scene()
+        if self.current_scene is not self.scenes["title"]:
+            self.initialize_score()
+            self.update_score()
+    
+    def count_fish(self):
+        self.fish_count += 1
+
+    def initialize_score(self):
+        if self.score.canvas is None:
+            self.style_text(self.score)
+            self.score.draw(self.win)
+
+    def update_score(self):
+        self.num_score.undraw()
+        self.num_score = gph.Text(gph.Point(350, 22), str(self.fish_count))
+        self.style_text(self.num_score)
+        self.num_score.draw(self.win)
+
+    def style_text(self, text):
+        text.setSize(20)
+        text.setFace("courier")
+        text.setStyle("bold")
+        text.setTextColor("white")
 
     def _background_frames(self):
         gif = PILImage.open(ASSETS_DIR/"background.gif")
@@ -39,7 +65,7 @@ class Game:
         self.state["i"] = (self.state["i"] + 1) % len(self.frames)
         self.win.master.after(120, self._background_loop)
 
-    def _loop(self):        
+    def _loop(self):
         key = self.win.checkKey().upper()
         if key in ("ESCAPE", "Q"):
             radio.play(AUDIOS_DIR/"sfx"/"exit.wav")
