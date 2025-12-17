@@ -9,7 +9,7 @@ class Cursor(Entity):
 
     def getSprites(self, difficulty):
         if difficulty == "easy":
-            return gph.Image(gph.Point(1060, 520), ASSETS_DIR/"cursor-easy.png")
+            return gph.Image(gph.Point(1060, 536.5), ASSETS_DIR/"cursor-easy.png")
         if difficulty == "medium":
             return gph.Image(gph.Point(1060, 583), ASSETS_DIR/"cursor-medium.png")
         if difficulty == "hard":
